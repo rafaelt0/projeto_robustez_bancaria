@@ -1,0 +1,7 @@
+Prioridade,Melhoria,Impacto Esperado,Esforço
+ALTA,Validação Cruzada Temporal,Medir capacidade preditiva real,Baixo
+ALTA,"Feature Engineering (NPL growth, volatilidade)",Capturar dinâmica temporal,Médio
+ALTA,Verificar Multicolinearidade (VIF),Reduzir coeficientes inflados,Baixo
+MÉDIA,Modelo Ensemble (Logit + XGBoost),Melhorar AUC em 5-10%,Alto
+MÉDIA,Random Effects Logit (Painel),Controlar heterogeneidade entre bancos,Médio
+BAIXA,Modelo de Sobrevivência (Cox),Modelar tempo até estresse,Alto

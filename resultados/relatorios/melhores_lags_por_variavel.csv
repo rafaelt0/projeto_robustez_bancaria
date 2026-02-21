@@ -1,0 +1,9 @@
+Variable,Best_Lag_AIC,Best_Lag_BIC,Best_Lag_R2
+RWA_Credito,4,4,3
+RWA_Mercado,4,4,1
+RWA_Operacional,4,4,4
+Capital_Principal,4,4,3
+Alavancagem,4,4,1
+PIB,4,4,4
+IPCA,4,4,1
+Spread,4,4,2

@@ -1,0 +1,56 @@
+% ==========================================================
+% TABELA DE RESULTADOS DO MODELO LOGIT FINAL (CONSOLIDADO)
+% ==========================================================
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Coeficientes Estimados para o Modelo de Estresse Logit Consolidado (P90)}
+  \label{tab:logit_results}
+  \begin{tabular}{lcccc}
+    \hline
+    \textbf{Variável} & \textbf{Coeficiente} & \textbf{Erro Padrão} & \textbf{Estatística-z} & \textbf{Valor-p} \\
+    \hline
+    Constante & -16,9870*** & 2,2020 & -7,714 & 0,0000 \\
+    RWA Crédito (defasagem 4) & -51,6320*** & 7,8470 & -6,580 & 0,0000 \\
+    RWA Mercado (defasagem 4) & -0,5620 & 1,8450 & -0,305 & 0,7610 \\
+    RWA Operacional (defasagem 4) & 3,8220 & 2,6700 & 1,431 & 0,1520 \\
+    Capital Principal (defasagem 4) & -0,3400*** & 0,1080 & -3,148 & 0,0020 \\
+    Razão de Alavancagem (defasagem 4) & -0,6910*** & 0,1570 & -4,401 & 0,0000 \\
+    Crescimento do PIB (defasagem 4) & -0,4280** & 0,1870 & -2,289 & 0,0220 \\
+    Spread de Juros (defasagem 4) & -0,0250 & 0,1210 & -0,207 & 0,8350 \\
+    Taxa de Desemprego (defasagem 4) & 0,1420 & 0,2040 & 0,696 & 0,4860 \\
+    Taxa Selic (defasagem 4) & 0,3560** & 0,1620 & 2,198 & 0,0280 \\
+    Volatilidade da Inadimplência (8T defasagem 4) & 0,2150*** & 0,0580 & 3,707 & 0,0000 \\
+    Interação: RWA Op x Alavancagem & 3,4050*** & 0,5610 & 6,070 & 0,0000 \\
+    \hline
+    \multicolumn{5}{l}{\textit{Nota: *** p<0,01, ** p<0,05, * p<0,1. Limiar: P90 do Índice de Inadimplência (NPL).}} \\
+    \multicolumn{5}{l}{\textit{Número de observações: 2.505. Pseudo R2: 0,2621. AUC-ROC: 0,8655.}} \\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+% ==========================================================
+% TABELA DE PERFORMANCE E METRICAS
+% ==========================================================
+
+
+\begin{table}[htbp]
+  \centering
+  \caption{Desempenho Preditivo do Modelo (Limiar = 0,175)}
+  \label{tab:performance}
+  \begin{tabular}{lc}
+    \hline
+    \textbf{Métrica} & \textbf{Valor} \\
+    \hline
+    Área sob a Curva ROC (AUC) & 0,8655 \\
+    Pseudo R-quadrado (McFadden) & 0,2621 \\
+    Log-Verossimilhança & -477,65 \\
+    Revocação (Sensibilidade) & 61,1\% \\
+    Precisão & 36,3\% \\
+    F1-Score & 0,455 \\
+    Acurácia Geral & 90,1\% \\
+    \hline
+  \end{tabular}
+\end{table}

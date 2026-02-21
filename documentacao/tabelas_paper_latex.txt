@@ -1,0 +1,115 @@
+% --- TABELAS PARA PAPER DE ECONOMETRIA ---
+% Requisito: \usepackage{booktabs}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Ranking de Robustez Institucional (Escala Log-Odds)}
+  \label{tab:ranking_robustez}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Instituicao} & \textbf{Score Log Odds Robustez} \\
+    \midrule
+    BB - PRUDENCIAL & 8.2118 \\
+    SANTANDER - PRUDENCIAL & 4.7819 \\
+    ITAU - PRUDENCIAL & 4.6342 \\
+    DEUTSCHE - PRUDENCIAL & 4.5815 \\
+    BANRISUL - PRUDENCIAL & 4.1632 \\
+    JP MORGAN CHASE - PRUDENCIAL & 4.1227 \\
+    BRADESCO - PRUDENCIAL & 3.9437 \\
+    CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 3.9317 \\
+    CITIBANK - PRUDENCIAL & 3.8160 \\
+    BTG PACTUAL - PRUDENCIAL & 3.7150 \\
+    VOTORANTIM - PRUDENCIAL & 2.7556 \\
+    SAFRA - PRUDENCIAL & 2.7305 \\
+    BCO DAYCOVAL S.A - PRUDENCIAL & 2.4990 \\
+    PINE - PRUDENCIAL & 2.4664 \\
+    BMG - PRUDENCIAL & 2.4664 \\
+    ABC-BRASIL - PRUDENCIAL & 2.4441 \\
+    BNP PARIBAS - PRUDENCIAL & 1.8888 \\
+    ORIGINAL - PRUDENCIAL & 1.7528 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Critérios de Informação para Seleção de Defasagem (Lag)}
+  \label{tab:selecao_lags}
+  \begin{tabular}{llll}
+    \toprule
+    \textbf{Lag} & \textbf{AIC} & \textbf{BIC} & \textbf{Pseudo R2} \\
+    \midrule
+    1 & 709.2785 & 750.1087 & 0.1079 \\
+    2 & 685.9453 & 726.5376 & 0.1188 \\
+    3 & 660.1629 & 700.5109 & 0.1256 \\
+    4 & 645.1177 & 685.2144 & 0.1178 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Melhores Defasagens (Lags) Individuais por Indicador}
+  \label{tab:lags_variaveis}
+  \begin{tabular}{l}
+    \toprule
+    \textbf{Variable,Best Lag AIC,Best Lag BIC,Best Lag R2} \\
+    \midrule
+    RWA Credito,4,4,3 \\
+    RWA Mercado,4,4,1 \\
+    RWA Operacional,4,4,4 \\
+    Capital Principal,4,4,3 \\
+    Alavancagem,4,4,1 \\
+    PIB,4,4,4 \\
+    IPCA,4,4,1 \\
+    Spread,4,4,2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Função de Densidade de Probabilidade (PDF) Estimada do Índice NPL}
+  \label{tab:pdf_npl}
+  \begin{tabular}{l}
+    \toprule
+    \textbf{Indice NPL (%),Densidade PDF Estimada} \\
+    \midrule
+    0.00\%,4.1128 \\
+    3.10\%,10.2874 \\
+    6.21\%,13.2082 \\
+    9.31\%,4.1513 \\
+    12.41\%,0.6562 \\
+    15.52\%,0.3822 \\
+    18.62\%,0.1686 \\
+    21.72\%,0.0344 \\
+    24.83\%,0.0053 \\
+    27.93\%,0.0716 \\
+    31.03\%,0.0803 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Função de Distribuição Acumulada (CDF) do Índice NPL}
+  \label{tab:cdf_npl}
+  \begin{tabular}{l}
+    \toprule
+    \textbf{Indice NPL (%),Probabilidade Acumulada (CDF),Interpretacao} \\
+    \midrule
+    0.00\%,0.0300,3.0\% das observações são <= 0.00\% \\
+    3.10\%,0.2489,24.9\% das observações são <= 3.10\% \\
+    6.21\%,0.6495,64.9\% das observações são <= 6.21\% \\
+    9.31\%,0.9185,91.8\% das observações são <= 9.31\% \\
+    12.41\%,0.9714,97.1\% das observações são <= 12.41\% \\
+    15.52\%,0.9828,98.3\% das observações são <= 15.52\% \\
+    18.62\%,0.9943,99.4\% das observações são <= 18.62\% \\
+    21.72\%,0.9943,99.4\% das observações são <= 21.72\% \\
+    24.83\%,0.9957,99.6\% das observações são <= 24.83\% \\
+    27.93\%,0.9957,99.6\% das observações são <= 27.93\% \\
+    31.03\%,1.0000,100.0\% das observações são <= 31.03\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+

@@ -1,0 +1,10 @@
+Variavel,Coeficiente,Odds Ratio,P-valor,Significancia,Interpretacao
+const,-16.4358668695599,7.27769269441179e-08,6.284392987995371e-22,***,Intercepto
+RWA_Credito_lag4,-49.97154065395038,1.984429350433402e-22,1.5039849008985366e-15,***,Maior RWA Credito REDUZ risco (protetor forte)
+RWA_Mercado_lag4,-0.8180473223256242,0.44129251578360523,0.6647037684825821,,RWA Mercado nao significativo
+RWA_Operacional_lag4,2.029130635997805,7.60746982269592,0.3502567209461298,,Maior RWA Operacional AUMENTA risco (direto)
+Capital_Principal_lag4,-0.3583373840791799,0.6988372586634118,0.00018477930798191708,***,Maior Capital REDUZ risco (protetor moderado)
+Alavancagem_lag4,-0.3424795513527472,0.7100076379328433,0.0017592246423304692,***,"Maior Alavancagem REDUZ risco (direto, contra-intuitivo)"
+PIB_lag4,-0.14234344802389207,0.8673233248448324,0.0774085744880847,*,Crescimento PIB REDUZ risco (protetor fraco)
+Spread_lag4,0.14333553012156547,1.1541169777175986,0.050357493629003214,*,Maior Spread AUMENTA risco (custo de funding)
+RWA_Operacional_lag4_x_Alavancagem_lag4,2.4399483097247368,11.472447713487789,8.866309871966893e-10,***,INTERACAO: Risco Operacional x Alavancagem AMPLIFICA risco

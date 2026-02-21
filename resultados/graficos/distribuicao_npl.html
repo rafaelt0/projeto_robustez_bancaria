@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Distribuição de NPL</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #38bdf8;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f43f5e;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .chart {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            gap: 4px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(180deg, #38bdf8, #1d4ed8);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+        }
+
+        .bar:hover {
+            background: #60a5fa;
+            cursor: pointer;
+        }
+
+        .axis-label {
+            font-size: 10px;
+            color: #64748b;
+            transform: rotate(-45deg);
+            margin-top: 10px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: -30px;
+            background: #334155;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            display: none;
+            white-space: nowrap;
+        }
+
+        .bar-container:hover .tooltip {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Distribuição do Índice NPL</h1>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-val">5,36%</div>
+                <div class="stat-label">Média NPL</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">5,24%</div>
+                <div class="stat-label">Mediana NPL</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">7,01%</div>
+                <div class="stat-label">Percentil 75</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">31,03%</div>
+                <div class="stat-label">Outlier Máximo</div>
+            </div>
+        </div>
+        <div class="chart">
+            <div class="bar-container">
+                <div class="bar" style="height: 46%;"></div>
+                <div class="tooltip">0.0 - 1.5%: 75 itens</div>
+                <div class="axis-label">0.0%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 61%;"></div>
+                <div class="tooltip">1.5 - 3.1%: 99 itens</div>
+                <div class="axis-label">1.5%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 73%;"></div>
+                <div class="tooltip">3.1 - 4.6%: 119 itens</div>
+                <div class="axis-label">3.1%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 100%;"></div>
+                <div class="tooltip">4.6 - 6.2%: 161 itens</div>
+                <div class="axis-label">4.6%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 80%;"></div>
+                <div class="tooltip">6.2 - 7.7%: 130 itens</div>
+                <div class="axis-label">6.2%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 36%;"></div>
+                <div class="tooltip">7.7 - 9.3%: 58 itens</div>
+                <div class="axis-label">7.7%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 17%;"></div>
+                <div class="tooltip">9.3 - 10.8%: 28 itens</div>
+                <div class="axis-label">9.3%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 5%;"></div>
+                <div class="tooltip">10.8 - 12.4%: 9 itens</div>
+                <div class="axis-label">10.8%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 2%;"></div>
+                <div class="tooltip">12.4 - 13.9%: 4 itens</div>
+                <div class="axis-label">12.4%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 2%;"></div>
+                <div class="tooltip">13.9 - 15.5%: 4 itens</div>
+                <div class="axis-label">13.9%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 2%;"></div>
+                <div class="tooltip">15.5 - 17.0%: 4 itens</div>
+                <div class="axis-label">15.5%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 2%;"></div>
+                <div class="tooltip">17.0 - 18.6%: 4 itens</div>
+                <div class="axis-label">17.0%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 1%;"></div>
+                <div class="tooltip">21.7 - 23.2%: 1 item</div>
+                <div class="axis-label">21.7%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 1%;"></div>
+                <div class="tooltip">27.9 - 29.4%: 1 item</div>
+                <div class="axis-label">27.9%</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar" style="height: 1%;"></div>
+                <div class="tooltip">29.4 - 31.0%: 2 itens</div>
+                <div class="axis-label">29.4%</div>
+            </div>
+        </div>
+        <p style="font-size: 12px; color: #64748b; margin-top: 40px; text-align: center;">Análise de distribuição
+            baseada em 699 observações trimestrais dos bancos selecionados.</p>
+    </div>
+</body>
+
+</html>

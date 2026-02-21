@@ -1,0 +1,9 @@
+Característica,Modelo Original (Manual),Modelo P95 (Statsmodels),Modelo P90 (Statsmodels),Modelo P90 Otimizado
+Threshold de Estresse (NPL),P95 (24.18%),P95 (24.18%),P90 (12.41%),P90 (12.41%)
+Observações em Estresse,118,118,254,254
+% do Dataset,4.0%,4.0%,8.6%,8.6%
+Threshold de Decisão,0.5 (padrão),0.5 (padrão),0.5 (padrão),0.175 (otimizado)
+Método de Estimação,Gradient Descent Manual,Maximum Likelihood (BFGS),Maximum Likelihood (BFGS),Maximum Likelihood (BFGS)
+Lag (trimestres),4,4,4,4
+Variáveis Preditoras,8,8,8,8
+Observações Totais,2953,2953,2953,2953
