@@ -45,14 +45,21 @@ df['Data'] = pd.to_datetime(df['Data'], errors='coerce')
 df.dropna(subset=['Data', 'NPL'], inplace=True)
 df.sort_values(['Instituicao', 'Data'], inplace=True)
 
-# 2. Definir threshold P90
-threshold_p90 = df['NPL'].quantile(0.90)
+# 2. Divisao Temporal (Prevenir Lookahead Bias)
+split_date = '2023-01-01'
+df_train = df[df['Data'] < split_date].copy()
+df_test = df[df['Data'] >= split_date].copy()
+
+# Definir threshold P90 BASEADO APENAS NO TREINO
+threshold_p90 = df_train['NPL'].quantile(0.90)
 df['Estresse_Alto_P90'] = (df['NPL'] > threshold_p90).astype(int)
 
 print(f"\n{'='*100}")
-print(f"PREPARACAO DOS DADOS")
+print(f"PREPARACAO DOS DADOS (OUT-OF-TIME VALIDATION)")
 print(f"{'='*100}")
-print(f"Threshold P90: {threshold_p90*100:.2f}%")
+print(f"Periodo de Treino: {df_train['Data'].min().year} - {df_train['Data'].max().year}")
+print(f"Periodo de Teste: {df_test['Data'].min().year} - {df_test['Data'].max().year}")
+print(f"Threshold P90 (do Treino): {threshold_p90*100:.2f}%")
 print(f"Observacoes em estresse: {df['Estresse_Alto_P90'].sum()} ({df['Estresse_Alto_P90'].mean()*100:.1f}%)")
 
 # 3. Criar lags (SEM IPCA)
@@ -67,16 +74,27 @@ for f in features:
 # Criar termo de interação
 df['RWA_Operacional_lag4_x_Alavancagem_lag4'] = df['RWA_Operacional_lag4'] * df['Alavancagem_lag4']
 
+# 4. Separar em Treino e Teste (Apos criacao de lags)
 df_clean = df.dropna(subset=lag_cols + ['Estresse_Alto_P90']).copy()
+train_mask = df_clean['Data'] < split_date
+df_final_train = df_clean[train_mask].copy()
+df_final_test = df_clean[~train_mask].copy()
 
-print(f"Observacoes apos lags: {len(df_clean)}")
+X_train = df_final_train[lag_cols + ['RWA_Operacional_lag4_x_Alavancagem_lag4']]
+y_train = df_final_train['Estresse_Alto_P90']
 
-# 4. Preparar features
-X = df_clean[lag_cols + ['RWA_Operacional_lag4_x_Alavancagem_lag4']]
-y = df_clean['Estresse_Alto_P90']
+X_test = df_final_test[lag_cols + ['RWA_Operacional_lag4_x_Alavancagem_lag4']]
+y_test = df_final_test['Estresse_Alto_P90']
 
-X_scaled = (X - X.mean()) / X.std()
-X_scaled = sm.add_constant(X_scaled)
+# Scaling Robusto (Parametros do Treino aplicados ao Teste)
+X_mean = X_train.mean()
+X_std = X_train.std()
+
+X_train_scaled = (X_train - X_mean) / X_std
+X_train_scaled = sm.add_constant(X_train_scaled)
+
+X_test_scaled = (X_test - X_mean) / X_std
+X_test_scaled = sm.add_constant(X_test_scaled)
 
 # 5. Ajustar modelo com Pesos de Classe (Weighted Logit)
 print(f"\n{'='*100}")
@@ -92,54 +110,54 @@ weights = y.apply(lambda x: weight_stress if x == 1 else weight_normal)
 print(f"Pesos calculados -> Normal: {weight_normal:.1f}, Estresse: {weight_stress:.1f}")
 
 # Usar GLM para permitir pesos
-model_final = sm.GLM(y, X_scaled, family=sm.families.Binomial(), var_weights=weights).fit()
+model_final = sm.GLM(y_train, X_train_scaled, family=sm.families.Binomial(), var_weights=weights).fit()
 
-# 6. Exibir resultados
+# 6. Exibir resultados do Treino
 print(f"\n{'='*100}")
-print(f"RESUMO DO MODELO FINAL")
+print(f"RESUMO DO MODELO (DADOS DE TREINO)")
 print(f"{'='*100}")
 print(model_final.summary())
 
-# 7. Calcular probabilidades e scores
-df_clean['Prob_Estresse'] = model_final.predict(X_scaled)
-df_clean['Log_Odds_Estresse'] = np.log(df_clean['Prob_Estresse'] / (1 - df_clean['Prob_Estresse'] + 1e-10))
-df_clean['Score_Robustez'] = -df_clean['Log_Odds_Estresse']
-
-# 8. Métricas de performance com threshold otimizado (0.60)
+# 7. Avaliar em Treino e Teste
 threshold_decision = 0.60
-y_pred_prob = df_clean['Prob_Estresse']
-y_pred_class = (y_pred_prob > threshold_decision).astype(int)
 
-auc_score = roc_auc_score(y, y_pred_prob)
+def get_performance(X_data, y_data):
+    probs = model_final.predict(X_data)
+    preds = (probs > threshold_decision).astype(int)
+    auc = roc_auc_score(y_data, probs)
+    rep = classification_report(y_data, preds, target_names=['Normal', 'Estresse'], output_dict=True)
+    return auc, rep, probs
 
-# Pseudo R2 aproximado para GLM (McFadden)
-def calculate_pseudo_r2(model, y, weights):
-    # Log-likelihood do modelo nulo
-    null_model = sm.GLM(y, np.ones(len(y)), family=sm.families.Binomial(), var_weights=weights).fit()
+auc_train, rep_train, probs_train = get_performance(X_train_scaled, y_train)
+auc_test, rep_test, probs_test = get_performance(X_test_scaled, y_test)
+
+df_final_test['Prob_Estresse'] = probs_test
+df_final_test['Score_Robustez'] = -np.log(probs_test / (1 - probs_test + 1e-10))
+
+# Pseudo R2 para GLM (McFadden)
+def calculate_pseudo_r2(model, y, w):
+    null_model = sm.GLM(y, np.ones(len(y)), family=sm.families.Binomial(), var_weights=w).fit()
     return 1 - (model.llf / null_model.llf)
 
-pseudo_r2 = calculate_pseudo_r2(model_final, y, weights)
+pr2_train = calculate_pseudo_r2(model_final, y_train, weights)
 
-print(f"AUC-ROC: {auc_score:.4f}")
-print(f"Pseudo R2 (Weighted): {pseudo_r2:.4f}")
-print(f"Log-Likelihood: {model_final.llf:.2f}")
-print(f"\nMatriz de Confusao:")
-classification_metrics = classification_report(y, y_pred_class, target_names=['Normal', 'Estresse'], output_dict=True)
-print(classification_report(y, y_pred_class, target_names=['Normal', 'Estresse']))
+print(f"\nMETRICAS DE PERFORMANCE (Threshold = {threshold_decision})")
+print(f"TREINO (In-Sample): AUC={auc_train:.4f}, Recall={rep_train['Estresse']['recall']:.1%}, Prec={rep_train['Estresse']['precision']:.1%}")
+print(f"TESTE (Out-of-Time): AUC={auc_test:.4f}, Recall={rep_test['Estresse']['recall']:.1%}, Prec={rep_test['Estresse']['precision']:.1%}")
 
 # Preparar CSV de performance para o Latex
 perf_metrics = pd.DataFrame({
-    'Metric': ['AUC', 'Pseudo_R2', 'Log_Likelihood', 'Recall', 'Precision', 'F1_Score', 'Accuracy'],
+    'Metric': ['AUC_Train', 'AUC_Test', 'PR2_Train', 'Recall_Test', 'Precision_Test', 'F1_Test', 'Acc_Test'],
     'Value': [
-        auc_score,
-        pseudo_r2,
-        model_final.llf,
-        classification_metrics['Estresse']['recall'],
-        classification_metrics['Estresse']['precision'],
-        classification_metrics['Estresse']['f1-score'],
-        classification_metrics['accuracy']
+        auc_train, auc_test, pr2_train,
+        rep_test['Estresse']['recall'], 
+        rep_test['Estresse']['precision'],
+        rep_test['Estresse']['f1-score'],
+        rep_test['accuracy']
     ]
 })
+perf_csv = 'resultados/relatorios/modelo_final_performance.csv'
+perf_metrics.to_csv(perf_csv, index=False)
 perf_csv = 'resultados/relatorios/modelo_final_performance.csv'
 perf_metrics.to_csv(perf_csv, index=False)
 
@@ -172,14 +190,21 @@ odds_ratios = pd.DataFrame({
 
 print(odds_ratios.to_string(index=False))
 
-# 10. Ranking de robustez
-summary_score = df_clean.groupby('Instituicao').agg({
-    'Score_Robustez': 'mean',
+# Para o ranking, usar o trimestre mais recente (2025)
+risk_summary = df_final_test.groupby('Instituicao').agg({
     'Prob_Estresse': 'mean',
+    'Score_Robustez': 'mean',
+    'Estresse_Alto_P90': 'sum',
     'NPL': 'mean'
 }).reset_index()
-summary_score.columns = ['Instituicao', 'Score_Robustez', 'Prob_Estresse_Media', 'NPL_Medio']
-summary_score.sort_values(by='Score_Robustez', ascending=False, inplace=True)
+risk_summary.columns = ['Instituicao', 'Prob_Estresse_Media', 'Score_Robustez_Media', 'Alertas_Total', 'NPL_Medio']
+risk_summary['Alertas_Total'] = risk_summary['Alertas_Total'].astype(int) # Convert to int
+risk_summary.sort_values(by='Score_Robustez_Media', ascending=False, inplace=True)
+
+# O summary_score agora é o ranking de robustez geral do df_final_test
+summary_score = risk_summary.copy()
+summary_score.rename(columns={'Score_Robustez_Media': 'Score_Robustez'}, inplace=True)
+
 
 print(f"\n{'='*100}")
 print(f"RANKING DE ROBUSTEZ (Top 20)")
@@ -279,15 +304,15 @@ print(f"RESUMO EXECUTIVO")
 print(f"{'='*100}")
 
 print(f"""
-MODELO FINAL - ESPECIFICACOES:
+MODELO FINAL (OUT-OF-TIME) - ESPECIFICACOES:
 - Variaveis: 7 principais + 1 interacao (SEM IPCA)
 - Metodo: GLM com Pesos de Classe (Balanceado)
-- AUC-ROC: {auc_score:.4f}
-- Pseudo R2 (Weighted): {pseudo_r2:.4f}
+- Treino (In-Sample AUC): {auc_train:.4f}
+- Teste (OOT AUC): {auc_test:.4f}
 - Threshold de decisao: {threshold_decision}
-- Recall: {classification_report(y, y_pred_class, output_dict=True)['1']['recall']:.1%}
-- Precision: {classification_report(y, y_pred_class, output_dict=True)['1']['precision']:.1%}
-- F1-Score: {classification_report(y, y_pred_class, output_dict=True)['1']['f1-score']:.4f}
+- Recall (OOT): {rep_test['Estresse']['recall']:.1%}
+- Precision (OOT): {rep_test['Estresse']['precision']:.1%}
+- F1-Score (OOT): {rep_test['Estresse']['f1-score']:.4f}
 
 VARIAVEIS SIGNIFICATIVAS (p < 0.05):
 - RWA_Credito_lag4 (p < 0.001) - Protetor forte

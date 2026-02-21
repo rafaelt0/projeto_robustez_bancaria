@@ -36,8 +36,8 @@ try:
 except Exception as e:
     print(f"Erro ao ler CSV de performance. Usando defaults. {e}")
     metrics = {
-        'AUC': 0.8655, 'Pseudo_R2': 0.2621, 'Log_Likelihood': -477.65,
-        'Recall': 0.611, 'Precision': 0.363, 'F1_Score': 0.455, 'Accuracy': 0.901
+        'AUC_Train': 0.81, 'AUC_Test': 0.79, 'PR2_Train': 0.25,
+        'Recall_Test': 0.70, 'Precision_Test': 0.20, 'F1_Test': 0.30, 'Acc_Test': 0.75
     }
 
 # Gerar Tabela 1: Coeficientes do Modelo Final
@@ -60,7 +60,7 @@ for res in model_results:
 
 latex_table1 += r"""    \hline
     \multicolumn{5}{l}{\textit{Nota: *** p<0.01, ** p<0.05, * p<0.1. Limiar: P90 do Índice NPL.}} \\
-    \multicolumn{5}{l}{\textit{Pseudo R2: """ + f"{metrics['Pseudo_R2']:.4f}" + r""". AUC-ROC: """ + f"{metrics['AUC']:.4f}" + r""".}} \\
+    \multicolumn{5}{l}{\textit{Pseudo $R^2$ (Treino): """ + f"{metrics['PR2_Train']:.4f}" + r""". AUC-ROC (Teste OOT): """ + f"{metrics['AUC_Test']:.4f}" + r""".}} \\
     \hline
   \end{tabular}
 \end{table}
@@ -72,17 +72,15 @@ latex_table2 = r"""
   \centering
   \caption{Desempenho Preditivo do Modelo (Limiar = 0.60)}
   \label{tab:performance}
-  \begin{tabular}{lc}
+  \begin{tabular}{lcc}
     \hline
-    \textbf{Métrica} & \textbf{Valor} \\
+    \textbf{Métrica} & \textbf{Treino (In-Sample)} & \textbf{Teste (Out-of-Time)} \\
     \hline
-    Área sob a Curva ROC (AUC) & """ + f"{metrics['AUC']:.4f}" + r""" \\
-    Pseudo R-quadrado (McFadden) & """ + f"{metrics['Pseudo_R2']:.4f}" + r""" \\
-    Log-Verossimilhança & """ + f"{metrics['Log_Likelihood']:.2f}" + r""" \\
-    Recall (Sensibilidade) & """ + f"{metrics['Recall']*100:.1f}" + r"\%" + r""" \\
-    Precisão & """ + f"{metrics['Precision']*100:.1f}" + r"\%" + r""" \\
-    F1-Score & """ + f"{metrics['F1_Score']:.3f}" + r""" \\
-    Acurácia Global & """ + f"{metrics['Accuracy']*100:.1f}" + r"\%" + r""" \\
+    Área sob a Curva ROC (AUC) & """ + f"{metrics['AUC_Train']:.4f}" + r""" & """ + f"{metrics['AUC_Test']:.4f}" + r""" \\
+    Recall (Sensibilidade) & -- & """ + f"{metrics['Recall_Test']*100:.1f}" + r"""\%""" + r""" \\
+    Precisão & -- & """ + f"{metrics['Precision_Test']*100:.1f}" + r"""\%""" + r""" \\
+    F1-Score & -- & """ + f"{metrics['F1_Test']:.3f}" + r""" \\
+    Acurácia Global & -- & """ + f"{metrics['Acc_Test']*100:.1f}" + r"""\%""" + r""" \\
     \hline
   \end{tabular}
 \end{table}
