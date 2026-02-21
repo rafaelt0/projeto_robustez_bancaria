@@ -3,7 +3,7 @@ import requests
 import json
 from datetime import datetime
 
-def fetch_sgs_series(series_code, start_date='01/01/2015'):
+def fetch_sgs_series(series_code, start_date='01/01/2009'):
     url = f"http://api.bcb.gov.br/dados/serie/bcdata.sgs.{series_code}/dados?formato=json&dataInicial={start_date}"
     try:
         response = requests.get(url, timeout=30)
