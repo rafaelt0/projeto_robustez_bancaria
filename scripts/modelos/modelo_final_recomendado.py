@@ -163,8 +163,6 @@ perf_metrics = pd.DataFrame({
 })
 perf_csv = 'resultados/relatorios/modelo_final_performance.csv'
 perf_metrics.to_csv(perf_csv, index=False)
-perf_csv = 'resultados/relatorios/modelo_final_performance.csv'
-perf_metrics.to_csv(perf_csv, index=False)
 
 # 9. Odds Ratios
 print(f"\n{'='*100}")
@@ -195,8 +193,8 @@ odds_ratios = pd.DataFrame({
 
 print(odds_ratios.to_string(index=False))
 
-# Para o ranking, usar o trimestre mais recente (2025)
-risk_summary = df_final_test.groupby('Instituicao').agg({
+# Para o ranking, usar o periodo de teste (Out-of-Time) em df_clean
+risk_summary = df_clean[~train_mask].groupby('Instituicao').agg({
     'Prob_Estresse': 'mean',
     'Score_Robustez': 'mean',
     'Estresse_Alto_P90': 'sum',
