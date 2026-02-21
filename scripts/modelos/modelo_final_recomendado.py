@@ -102,10 +102,10 @@ print(f"AJUSTANDO MODELO FINAL (WEIGHTED GLM)")
 print(f"{'='*100}")
 
 # Calcular pesos (inverso da frequencia das classes)
-counts = y.value_counts()
+counts = y_train.value_counts()
 weight_normal = 1.0
 weight_stress = counts[0] / counts[1]
-weights = y.apply(lambda x: weight_stress if x == 1 else weight_normal)
+weights = y_train.apply(lambda x: weight_stress if x == 1 else weight_normal)
 
 print(f"Pesos calculados -> Normal: {weight_normal:.1f}, Estresse: {weight_stress:.1f}")
 
