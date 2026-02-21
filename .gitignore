@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+build/
+dist/
+*.egg-info/
+
+# Data & Results (optional, typically we keep raw data and final reports but not temporary csvs)
+# dados/processados/
+# resultados/graficos/
+
+# System
+.DS_Store
+.vscode/
+.idea/

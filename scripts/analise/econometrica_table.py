@@ -4,8 +4,8 @@ import statsmodels.api as sm
 from pathlib import Path
 
 # Paths
-WORKSPACE_DIR = Path(r"d:\projeto_robustez_bancaria")
-DATA_PATH = WORKSPACE_DIR / "data" / "raw" / "painel_final.csv"
+WORKSPACE_DIR = Path(".")
+DATA_PATH = WORKSPACE_DIR / "dados" / "brutos" / "painel_final.csv"
 
 # Macro data subset
 macro_data = {
@@ -76,22 +76,42 @@ def generate_econometrica_table():
         
         summary_data.append([f.replace('_lag1', ''), f"{coef:.4f}{stars}", f"({std_err:.4f})"])
 
-    print("\nTABLE 1")
-    print("DETERMINANTS OF BANKING STRESS: LOGIT FIXED EFFECTS ESTIMATES")
-    print("-" * 60)
-    print(f"{'Variable':<25} {'Coefficient':<15} {'(Std. Err.)':<15}")
-    print("-" * 60)
+    print("Results computed. Generating LaTeX table...")
+    
+    latex_out = r"""\begin{table}[htbp]
+\centering
+\caption{Determinantes do Estresse Bancário: Estimativas Logit com Efeitos Fixos}
+\label{tab:fe_logit}
+\begin{tabular}{lc}
+\toprule
+\textbf{Variável} & \textbf{Coeficiente} \\
+                  & \textbf{(Erro Padrão)} \\
+\midrule
+"""
+    
     for row in summary_data:
-        print(f"{row[0]:<25} {row[1]:<15}")
-        print(f"{'':<25} {row[2]:<15}")
-    print("-" * 60)
-    print(f"Num. Observations:      {int(res.nobs)}")
-    print(f"Pseudo R-Squared:       {res.prsquared:.4f}")
-    print(f"Log-Likelihood:         {res.llf:.2f}")
-    print(f"Number of Entities:     {len(eligible)}")
-    print(f"Fixed Effects:          YES (Institution)")
-    print("-" * 60)
-    print("Notes: *** p<0.01, ** p<0.05, * p<0.1. Standard errors in parentheses.")
+        var_name = row[0].replace('_', '\\_')
+        latex_out += f"{var_name} & {row[1]} \\\\\n"
+        latex_out += f" & {row[2]} \\\\\n"
+        latex_out += "\\addlinespace\n"
+
+    latex_out += "\\midrule\n"
+    latex_out += f"Num. Observações & {int(res.nobs)} \\\\\n"
+    latex_out += f"Pseudo $R^2$ & {res.prsquared:.4f} \\\\\n"
+    latex_out += f"Log-Verossimilhança & {res.llf:.2f} \\\\\n"
+    latex_out += f"Número de Entidades & {len(eligible)} \\\\\n"
+    latex_out += "Efeitos Fixos & SIM \\\\\n"
+    latex_out += "\\bottomrule\n"
+    latex_out += "\\multicolumn{2}{l}{\\small \\textit{Notas:} *** $p<0.01$, ** $p<0.05$, * $p<0.1$. Erros padrão entre parênteses.} \\\\\n"
+    latex_out += "\\end{tabular}\n"
+    latex_out += "\\end{table}\n"
+
+    output_path = WORKSPACE_DIR / "resultados" / "relatorios" / "tabela_fe_econometrica.tex"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(latex_out)
+        
+    print(f"✅ LaTeX Table saved successfully at: {output_path}")
 
 if __name__ == "__main__":
     generate_econometrica_table()

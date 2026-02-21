@@ -1,9 +1,0 @@
-Variavel,P95,P90,Interpretacao P90
-RWA_Credito_lag4,SIM (p < 0.001),SIM (p < 0.001),Protetor forte (-58.5)
-RWA_Mercado_lag4,NAO (p = 0.463),NAO (p = 0.213),Nao significativo
-RWA_Operacional_lag4,SIM (p < 0.001),SIM (p < 0.001),Risco forte (+8.8)
-Capital_Principal_lag4,NAO (p = 0.154),SIM (p < 0.001) ***,Protetor moderado (-0.35)
-Alavancagem_lag4,SIM (p = 0.002),SIM (p = 0.019),Risco moderado (+0.14)
-PIB_lag4,SIM (p = 0.014),SIM (p = 0.079),Protetor fraco (-0.14)
-IPCA_lag4,NAO (p = 0.862),NAO (p = 0.570),Nao significativo
-Spread_lag4,NAO (p = 0.911),SIM (p = 0.050) ***,Risco moderado (+0.15)

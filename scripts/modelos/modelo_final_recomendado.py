@@ -31,8 +31,11 @@ VARIAVEIS REMOVIDAS:
 """)
 
 # 1. Carregar e preparar dados
-painel_path = 'd:/projeto_robustez_bancaria/dados/brutos/painel_final.csv'
+painel_path = 'dados/brutos/painel_final.csv'
 df = pd.read_csv(painel_path)
+
+# Remover BNDES (pois e banco de desenvolvimento e distorce o ranking puramente de varejo)
+df = df[df['Instituicao'] != 'BNDES - PRUDENCIAL'].copy()
 
 cols_to_fix = ['RWA_Credito', 'RWA_Mercado', 'RWA_Operacional', 'Capital_Principal', 'Alavancagem', 'PIB', 'IPCA', 'Spread', 'NPL']
 for col in cols_to_fix:
@@ -107,9 +110,24 @@ print(f"AUC-ROC: {auc_score:.4f}")
 print(f"Pseudo R2: {model_final.prsquared:.4f}")
 print(f"Log-Likelihood: {model_final.llf:.2f}")
 print(f"\nMatriz de Confusao:")
-print(confusion_matrix(y, y_pred_class))
-print(f"\nRelatorio de Classificacao:")
+classification_metrics = classification_report(y, y_pred_class, target_names=['Normal', 'Estresse'], output_dict=True)
 print(classification_report(y, y_pred_class, target_names=['Normal', 'Estresse']))
+
+# Preparar CSV de performance para o Latex
+perf_metrics = pd.DataFrame({
+    'Metric': ['AUC', 'Pseudo_R2', 'Log_Likelihood', 'Recall', 'Precision', 'F1_Score', 'Accuracy'],
+    'Value': [
+        auc_score,
+        model_final.prsquared,
+        model_final.llf,
+        classification_metrics['Estresse']['recall'],
+        classification_metrics['Estresse']['precision'],
+        classification_metrics['Estresse']['f1-score'],
+        classification_metrics['accuracy']
+    ]
+})
+perf_csv = 'resultados/relatorios/modelo_final_performance.csv'
+perf_metrics.to_csv(perf_csv, index=False)
 
 # 9. Odds Ratios
 print(f"\n{'='*100}")
@@ -119,6 +137,8 @@ print(f"{'='*100}")
 odds_ratios = pd.DataFrame({
     'Variavel': model_final.params.index,
     'Coeficiente': model_final.params.values,
+    'StdErr': model_final.bse.values,
+    'Z_stat': model_final.tvalues.values,
     'Odds Ratio': np.exp(model_final.params.values),
     'P-valor': model_final.pvalues.values,
     'Significancia': ['***' if p < 0.01 else '**' if p < 0.05 else '*' if p < 0.1 else '' 
@@ -170,10 +190,10 @@ print(f"{'='*100}")
 print(risk_summary.head(20).to_string(index=False))
 
 # 12. Salvar resultados
-output_csv = 'd:/projeto_robustez_bancaria/dados/processados/modelo_final_painel.csv'
-ranking_csv = 'd:/projeto_robustez_bancaria/resultados/relatorios/modelo_final_ranking.csv'
-risk_csv = 'd:/projeto_robustez_bancaria/resultados/relatorios/modelo_final_risk_alerts.csv'
-stats_csv = 'd:/projeto_robustez_bancaria/resultados/relatorios/modelo_final_statistics.csv'
+output_csv = 'dados/processados/modelo_final_painel.csv'
+ranking_csv = 'resultados/relatorios/modelo_final_ranking.csv'
+risk_csv = 'resultados/relatorios/modelo_final_risk_alerts.csv'
+stats_csv = 'resultados/relatorios/modelo_final_statistics.csv'
 
 df_clean.to_csv(output_csv, index=False)
 summary_score.to_csv(ranking_csv, index=False)
@@ -228,7 +248,7 @@ axes[1, 1].axvline(0, color='black', linestyle='-', linewidth=0.5)
 axes[1, 1].grid(axis='x', alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('d:/projeto_robustez_bancaria/resultados/graficos/modelo_final_diagnostics.png', dpi=300)
+plt.savefig('resultados/graficos/modelo_final_diagnostics.png', dpi=300)
 
 print(f"\n{'='*100}")
 print(f"ARQUIVOS SALVOS")

@@ -54,7 +54,7 @@ def coletar_indicadores_macro():
     macro_panel = macro_panel.drop(columns=['Data'])
 
     # 4. Salvar
-    output_path = 'd:/projeto_robustez_bancaria/dados/brutos/indicadores_macro_sgs.csv'
+    output_path = 'dados/brutos/indicadores_macro_sgs.csv'
     macro_panel.to_csv(output_path, sep=';', decimal=',', index=False, encoding='latin1')
     
     print(f"\n[OK] Indicadores macro salvos com chave unica em: {output_path}")

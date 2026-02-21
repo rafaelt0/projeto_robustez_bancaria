@@ -1,3 +1,12 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\begin{document}
+
 % ==========================================================
 % TABELA DE RESULTADOS DO MODELO LOGIT FINAL (CONSOLIDADO)
 % ==========================================================
@@ -5,27 +14,24 @@
 
 \begin{table}[htbp]
   \centering
-  \caption{Coeficientes Estimados para o Modelo de Estresse Logit Consolidado (P90)}
+  \caption{Coeficientes Estimados para o Modelo Logit de Estresse Consolidado (P90)}
   \label{tab:logit_results}
   \begin{tabular}{lcccc}
     \hline
-    \textbf{Variável} & \textbf{Coeficiente} & \textbf{Erro Padrão} & \textbf{Estatística-z} & \textbf{Valor-p} \\
+    \textbf{Variável} & \textbf{Coeficiente} & \textbf{Erro Padrão} & \textbf{Estatística z} & \textbf{Valor-p} \\
     \hline
-    Constante & -16,9870*** & 2,2020 & -7,714 & 0,0000 \\
-    RWA Crédito (defasagem 4) & -51,6320*** & 7,8470 & -6,580 & 0,0000 \\
-    RWA Mercado (defasagem 4) & -0,5620 & 1,8450 & -0,305 & 0,7610 \\
-    RWA Operacional (defasagem 4) & 3,8220 & 2,6700 & 1,431 & 0,1520 \\
-    Capital Principal (defasagem 4) & -0,3400*** & 0,1080 & -3,148 & 0,0020 \\
-    Razão de Alavancagem (defasagem 4) & -0,6910*** & 0,1570 & -4,401 & 0,0000 \\
-    Crescimento do PIB (defasagem 4) & -0,4280** & 0,1870 & -2,289 & 0,0220 \\
-    Spread de Juros (defasagem 4) & -0,0250 & 0,1210 & -0,207 & 0,8350 \\
-    Taxa de Desemprego (defasagem 4) & 0,1420 & 0,2040 & 0,696 & 0,4860 \\
-    Taxa Selic (defasagem 4) & 0,3560** & 0,1620 & 2,198 & 0,0280 \\
-    Volatilidade da Inadimplência (8T defasagem 4) & 0,2150*** & 0,0580 & 3,707 & 0,0000 \\
-    Interação: RWA Op x Alavancagem & 3,4050*** & 0,5610 & 6,070 & 0,0000 \\
+    const & -15.1205*** & 1.5561 & -9.717 & 0.0000 \\
+    RWA\_Credito\_lag4 & -48.4228*** & 6.0763 & -7.969 & 0.0000 \\
+    RWA\_Mercado\_lag4 & -0.3911 & 0.9831 & -0.398 & 0.6908 \\
+    RWA\_Operacional\_lag4 & 2.0206 & 2.0997 & 0.962 & 0.3359 \\
+    Capital\_Principal\_lag4 & -0.3715*** & 0.0975 & -3.812 & 0.0001 \\
+    Alavancagem\_lag4 & -0.3410*** & 0.1099 & -3.101 & 0.0019 \\
+    PIB\_lag4 & -0.1513* & 0.0806 & -1.877 & 0.0605 \\
+    Spread\_lag4 & 0.1411* & 0.0731 & 1.932 & 0.0534 \\
+    RWA\_Operacional\_lag4\_x\_Alavancagem\_lag4 & 1.8891*** & 0.3185 & 5.931 & 0.0000 \\
     \hline
-    \multicolumn{5}{l}{\textit{Nota: *** p<0,01, ** p<0,05, * p<0,1. Limiar: P90 do Índice de Inadimplência (NPL).}} \\
-    \multicolumn{5}{l}{\textit{Número de observações: 2.505. Pseudo R2: 0,2621. AUC-ROC: 0,8655.}} \\
+    \multicolumn{5}{l}{\textit{Nota: *** p<0.01, ** p<0.05, * p<0.1. Limiar: P90 do Índice NPL.}} \\
+    \multicolumn{5}{l}{\textit{Pseudo R2: 0.2030. AUC-ROC: 0.8215.}} \\
     \hline
   \end{tabular}
 \end{table}
@@ -38,19 +44,122 @@
 
 \begin{table}[htbp]
   \centering
-  \caption{Desempenho Preditivo do Modelo (Limiar = 0,175)}
+  \caption{Desempenho Preditivo do Modelo (Limiar = 0.175)}
   \label{tab:performance}
   \begin{tabular}{lc}
     \hline
     \textbf{Métrica} & \textbf{Valor} \\
     \hline
-    Área sob a Curva ROC (AUC) & 0,8655 \\
-    Pseudo R-quadrado (McFadden) & 0,2621 \\
-    Log-Verossimilhança & -477,65 \\
-    Revocação (Sensibilidade) & 61,1\% \\
-    Precisão & 36,3\% \\
-    F1-Score & 0,455 \\
-    Acurácia Geral & 90,1\% \\
+    Área sob a Curva ROC (AUC) & 0.8215 \\
+    Pseudo R-quadrado (McFadden) & 0.2030 \\
+    Log-Verossimilhança & -683.83 \\
+    Recall (Sensibilidade) & 50.4\% \\
+    Precisão & 28.2\% \\
+    F1-Score & 0.361 \\
+    Acurácia Global & 84.6\% \\
     \hline
   \end{tabular}
 \end{table}
+
+
+% ==========================================================
+% TABELA DE RANKING DE ROBUSTEZ (TOP 15 / BOTTOM 15)
+% ==========================================================
+
+
+\begin{table}[htbp]
+\centering
+\caption{Ranking de Robustez Bancária (Top 15 Melhores e Piores)} \label{tab:ranking_top_bottom}
+\begin{tabular}{cllc}
+\toprule
+\textbf{Pos.} & \textbf{Instituição} & \textbf{Score\_Robustez} & \textbf{Prob\_Estresse} \\
+\midrule
+\multicolumn{4}{c}{\textbf{Top 15 Instituições Mais Robustas}} \\
+\midrule
+1 & ITAU - PRUDENCIAL & 243.767 & 0.000 \\
+2 & BB - PRUDENCIAL & 201.526 & 0.000 \\
+3 & BRADESCO - PRUDENCIAL & 201.152 & 0.000 \\
+4 & CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 143.481 & 0.000 \\
+5 & SANTANDER - PRUDENCIAL & 123.946 & 0.000 \\
+6 & BTG PACTUAL - PRUDENCIAL & 39.455 & 0.000 \\
+7 & SAFRA - PRUDENCIAL & 32.948 & 0.000 \\
+8 & BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL & 20.956 & 0.000 \\
+9 & VOTORANTIM - PRUDENCIAL & 18.460 & 0.000 \\
+10 & NU PAGAMENTOS - PRUDENCIAL & 14.283 & 0.087 \\
+11 & CITIBANK - PRUDENCIAL & 12.038 & 0.000 \\
+12 & BANRISUL - PRUDENCIAL & 10.195 & 0.000 \\
+13 & ABC-BRASIL - PRUDENCIAL & 9.473 & 0.001 \\
+14 & XP - PRUDENCIAL & 9.446 & 0.000 \\
+15 & BCO DAYCOVAL S.A - PRUDENCIAL & 9.310 & 0.003 \\
+\midrule
+\multicolumn{4}{c}{\textbf{Top 15 Instituições Menos Robustas}} \\
+\midrule
+143 & LECCA - PRUDENCIAL & 1.114 & 0.249 \\
+144 & PINBANK BRASIL IP - PRUDENCIAL & 1.112 & 0.248 \\
+145 & EFI S.A. IP - PRUDENCIAL & 1.105 & 0.249 \\
+146 & BRINKS PAY IP - PRUDENCIAL & 1.101 & 0.249 \\
+147 & DM FINANCEIRA CFI - PRUDENCIAL & 1.075 & 0.255 \\
+148 & MÁXIMA - PRUDENCIAL & 1.071 & 0.260 \\
+149 & COMPANHIA PROVINCIA DE CREDITO IMOBILIARIO - PRUDE & 1.067 & 0.257 \\
+150 & SOROCRED CFI S.A. - PRUDENCIAL & 1.057 & 0.259 \\
+151 & SANTINVEST - PRUDENCIAL & 1.050 & 0.260 \\
+152 & SANTANA S.A. - CFI - PRUDENCIAL & 0.930 & 0.283 \\
+153 & AVISTA S.A. CFI - PRUDENCIAL & 0.894 & 0.293 \\
+154 & MONEY PLUS SCMEPP LTDA - PRUDENCIAL & 0.835 & 0.303 \\
+155 & CIELO - PRUDENCIAL & 0.834 & 0.303 \\
+156 & BANIF - PRUDENCIAL & 0.017 & 0.501 \\
+157 & CREFISA S.A. CFI - PRUDENCIAL & -1.290 & 0.737 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% ==========================================================
+% TABELA DE RESULTADOS DO MODELO FIXED EFFECTS (LOGIT)
+% ==========================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Determinantes do Estresse Bancário: Estimativas Logit com Efeitos Fixos}
+\label{tab:fe_logit}
+\begin{tabular}{lc}
+\toprule
+\textbf{Variável} & \textbf{Coeficiente} \\
+                  & \textbf{(Erro Padrão)} \\
+\midrule
+const & 1.2599 \\
+ & (1.2633) \\
+\addlinespace
+Capital\_Principal & -1.0662*** \\
+ & (0.3240) \\
+\addlinespace
+Alavancagem & 0.8734** \\
+ & (0.3791) \\
+\addlinespace
+PIB & -0.0611 \\
+ & (0.2371) \\
+\addlinespace
+Spread & 0.2979** \\
+ & (0.1451) \\
+\addlinespace
+Desemprego & 0.3998 \\
+ & (0.2688) \\
+\addlinespace
+Selic & 0.1897 \\
+ & (0.1811) \\
+\addlinespace
+NPL\_Volatility\_8Q & -0.0941 \\
+ & (0.1492) \\
+\addlinespace
+\midrule
+Num. Observações & 875 \\
+Pseudo $R^2$ & 0.3166 \\
+Log-Verossimilhança & -377.86 \\
+Número de Entidades & 49 \\
+Efeitos Fixos & SIM \\
+\bottomrule
+\multicolumn{2}{l}{\small \textit{Notas:} *** $p<0.01$, ** $p<0.05$, * $p<0.1$. Erros padrão entre parênteses.} \\
+\end{tabular}
+\end{table}
+
+\end{document}

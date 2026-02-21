@@ -1,7 +1,0 @@
-Cenário,Modelo Recomendado,Justificativa
-Early Warning System,P90 Otimizado,Recall alto (50%) detecta deterioração precoce
-Monitoramento Contínuo,P90 Otimizado,Equilíbrio precision/recall permite ação preventiva
-Decisões Regulatórias,P95,Precision 100% evita intervenções desnecessárias
-Análise de Portfólio,P90 Otimizado,Identifica instituições em risco moderado
-Stress Testing,P95,Foco em eventos extremos (tail risk)
-Pesquisa Acadêmica,P90 (Threshold Padrão),Significância estatística robusta

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # 1. Carregar Dados
-painel_path = 'd:/projeto_robustez_bancaria/dados/brutos/painel_final.csv'
+painel_path = 'dados/brutos/painel_final.csv'
 df = pd.read_csv(painel_path, sep=';', decimal=',', encoding='latin1')
 
 # 2. Processar NPL
@@ -44,7 +44,7 @@ plt.text(0.95, 0.95, stats_text, transform=ax.transAxes, color='#f8fafc',
 plt.grid(axis='y', color='#334155', linestyle='--', alpha=0.3)
 
 # Salvar
-output_img = 'd:/projeto_robustez_bancaria/resultados/graficos/distribuicao_npl.png'
+output_img = 'resultados/graficos/distribuicao_npl.png'
 plt.tight_layout()
 plt.savefig(output_img, dpi=300, facecolor='#0f172a')
 print(f"Gráfico gerado em: {output_img}")

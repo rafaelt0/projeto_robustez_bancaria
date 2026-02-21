@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # 1. Carregar Dados
-painel_path = 'd:/projeto_robustez_bancaria/dados/brutos/painel_final.csv'
+painel_path = 'dados/brutos/painel_final.csv'
 df = pd.read_csv(painel_path, sep=';', decimal=',', encoding='latin1')
 
 # 2. Processar NPL
@@ -35,5 +35,5 @@ print("\n--- Tabela da Função de Distribuição Acumulada (CDF) ---")
 print(cdf_table.to_string(index=False))
 
 # 5. Exportar
-cdf_table.to_csv('d:/projeto_robustez_bancaria/resultados/relatorios/tabela_cdf_npl.csv', sep=';', decimal=',', index=False, encoding='latin1')
+cdf_table.to_csv('resultados/relatorios/tabela_cdf_npl.csv', sep=';', decimal=',', index=False, encoding='latin1')
 print(f"\nTabela CDF salva.")

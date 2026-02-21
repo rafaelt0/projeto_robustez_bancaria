@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 # Paths
-OUTPUT_DIR = Path(r"d:\projeto_robustez_bancaria\resultados\stress_tests")
+OUTPUT_DIR = Path(r"resultados\stress_tests")
 SENSITIVITY_FILE = OUTPUT_DIR / "alpha_sensitivity_analysis.csv"
 ROBUST_FILE = OUTPUT_DIR / "ranking_robusto_consenso.csv"
 

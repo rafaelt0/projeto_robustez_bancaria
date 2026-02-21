@@ -16,26 +16,60 @@ Estimar a probabilidade de deterioração financeira das instituições com hori
 
 ## 📁 Estrutura do Projeto
 
+O projeto utiliza nomes de diretórios em português para compatibilidade com o código-fonte:
+
+```text
 projeto_robustez_bancaria/
 │
-├── data/
-│   ├── raw/                  # Dados brutos originais
-│   └── processed/            # Dados tratados e com features
+├── dados/
+│   ├── brutos/               # Dados brutos originais
+│   ├── processados/          # Dados tratados e com features
+│   └── consolidados/         # Painéis consolidados
 │
 ├── scripts/
-│   ├── models/               # Modelos econométricos
-│   │   ├── modelo_com_macros.py
-│   │   └── modelo_npl_features.py
-│   │
-│   ├── analysis/             # Geração de tabelas e estatísticas
-│   │   └── gerar_tabelas_latex.py
-│   │
-│   ├── data_prep/            # Limpeza e transformação
-│   └── utils/                # Funções auxiliares
+│   ├── modelos/              # Modelos econométricos
+│   ├── analise/              # Geração de tabelas, gráficos e testes
+│   ├── preparacao_dados/     # Limpeza e transformação (Scraping BCB)
+│   └── utilitarios/          # Funções auxiliares
 │
-├── docs/                     # Documentação técnica e LaTeX
-├── outputs/                  # Resultados e gráficos
+├── documentacao/             # Documentação técnica e LaTeX
+├── resultados/               # Resultados e gráficos
+│   ├── relatorios/
+│   ├── graficos/
+│   └── stress_tests/
 └── README.md
+```
+
+---
+
+## 🚀 Como Executar
+
+### 1. Requisitos
+- Python 3.10+
+- `pip` e `venv` (opcional, mas recomendado)
+
+### 2. Instalação
+```bash
+python3 -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Execução Rápida
+Para rodar a análise principal e gerar o ranking de robustez:
+```bash
+python scripts/modelos/modelo_final_recomendado.py
+```
+
+Para gerar as tabelas LaTeX para o artigo:
+```bash
+python scripts/analise/gerar_tabelas_latex.py
+```
+
+Para realizar os testes de estresse:
+```bash
+python scripts/analise/stress_testing.py
+```
 
 ---
 
@@ -76,19 +110,3 @@ Estresse Bancário (NPL > 12.41%)
 | AUC-ROC | 0.8655 |
 | Pseudo R² | 0.2621 |
 | Recall (@0.175) | 61.1% |
-
----
-
-## 🛠️ Requisitos
-
-- Python 3.10+
-- pandas
-- numpy
-- statsmodels
-- scikit-learn
-- matplotlib
-
-Instalação:
-
-```bash
-pip install -r requirements.txt
