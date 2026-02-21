@@ -41,29 +41,43 @@ def run_stress_testing():
         'RWA_Operacional_lag4_x_Alavancagem_lag4': 2.6068
     }
 
-    # Parâmetros de Scaling (Média e DP do treino 2016-2021)
-    # Aproximações baseadas na normalização padrão
-    scaling = {
-        'mean': 0.0, # Assumindo normalizado
-        'std': 1.0
+    # Parâmetros de Scaling Reais (Treino 2016-2021)
+    X_mean = {
+        'RWA_Credito_lag4': 47893019.866, 'RWA_Mercado_lag4': 1062413.580, 
+        'RWA_Operacional_lag4': 5042233.430, 'Capital_Principal_lag4': 0.1910,
+        'Alavancagem_lag4': 0.1148, 'PIB_lag4': 166.577, 'Spread_lag4': 31.919, 
+        'RWA_Operacional_lag4_x_Alavancagem_lag4': 460144.633
+    }
+    X_std = {
+        'RWA_Credito_lag4': 147903230.94, 'RWA_Mercado_lag4': 4762447.64, 
+        'RWA_Operacional_lag4': 14801409.28, 'Capital_Principal_lag4': 0.1417,
+        'Alavancagem_lag4': 0.1307, 'PIB_lag4': 4.111, 'Spread_lag4': 5.629, 
+        'RWA_Operacional_lag4_x_Alavancagem_lag4': 1258094.49
     }
 
     def calculate_risk(row, pib_shock=0.0, spread_shock=0.0, capital_shock=1.0):
-        # Aplicar Choques
-        pib = row.get('PIB', 0.0) + pib_shock
-        spread = row.get('Spread', 0.0) + spread_shock
-        cap = row.get('Capital_Principal', 0.0) * capital_shock
-        
-        # Manter outros como base (Normalizado para simplificar)
-        log_odds = (coefs['const'] + 
-                    coefs['RWA_Credito_lag4'] * row.get('RWA_Credito', 0) +
-                    coefs['RWA_Mercado_lag4'] * row.get('RWA_Mercado', 0) +
-                    coefs['RWA_Operacional_lag4'] * row.get('RWA_Operacional', 0) +
-                    coefs['Capital_Principal_lag4'] * cap +
-                    coefs['Alavancagem_lag4'] * row.get('Alavancagem', 0) +
-                    coefs['PIB_lag4'] * pib +
-                    coefs['Spread_lag4'] * spread +
-                    coefs['RWA_Operacional_lag4_x_Alavancagem_lag4'] * (row.get('RWA_Operacional', 0) * row.get('Alavancagem', 0)))
+        # 1. Preparar variáveis (Simulando Lags com os dados atuais mais recentes)
+        # Nota: Usamos os valores atuais como proxies para os valores em t-4 na simulação
+        v = {
+            'RWA_Credito_lag4': row.get('RWA_Credito', 0),
+            'RWA_Mercado_lag4': row.get('RWA_Mercado', 0),
+            'RWA_Operacional_lag4': row.get('RWA_Operacional', 0),
+            'Capital_Principal_lag4': row.get('Capital_Principal', 0) * capital_shock,
+            'Alavancagem_lag4': row.get('Alavancagem', 0),
+            'PIB_lag4': row.get('PIB', 0) + pib_shock,
+            'Spread_lag4': row.get('Spread', 0) + spread_shock
+        }
+        v['RWA_Operacional_lag4_x_Alavancagem_lag4'] = v['RWA_Operacional_lag4'] * v['Alavancagem_lag4']
+
+        # 2. Scaling (Z-score)
+        v_scaled = {}
+        for k in v:
+            v_scaled[k] = (v[k] - X_mean[k]) / X_std[k]
+
+        # 3. Log-Odds
+        log_odds = coefs['const']
+        for k in v_scaled:
+            log_odds += coefs[k] * v_scaled[k]
         
         prob = 1 / (1 + np.exp(-log_odds))
         return prob
@@ -72,9 +86,11 @@ def run_stress_testing():
     print("\nSimulando Cenários...")
     
     # Baseline
+    print("Baseline:")
     df_base['Prob_Baseline'] = df_base.apply(lambda r: calculate_risk(r), axis=1)
     
     # Stress Severo (-3% PIB, +2% Spread, -15% Capital)
+    print("Stress Severo:")
     df_base['Prob_Stress_Severo'] = df_base.apply(lambda r: calculate_risk(r, pib_shock=-0.03, spread_shock=0.02, capital_shock=0.85), axis=1)
     
     # Impacto no Score
