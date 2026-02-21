@@ -103,8 +103,14 @@ print(f"{'='*100}")
 
 # Calcular pesos (inverso da frequencia das classes)
 counts = y_train.value_counts()
+print(f"Distribuicao das classes no Treino: {counts.to_dict()}")
+
+# Forcar labels como inteiros e usar .get para evitar KeyError
+n_normal = counts.get(0, 1)
+n_stress = counts.get(1, 1)
+
 weight_normal = 1.0
-weight_stress = counts[0] / counts[1]
+weight_stress = n_normal / n_stress if n_stress > 0 else 1.0
 weights = y_train.apply(lambda x: weight_stress if x == 1 else weight_normal)
 
 print(f"Pesos calculados -> Normal: {weight_normal:.1f}, Estresse: {weight_stress:.1f}")
