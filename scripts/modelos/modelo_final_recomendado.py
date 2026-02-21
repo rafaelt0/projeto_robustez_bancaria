@@ -46,7 +46,7 @@ df.dropna(subset=['Data', 'NPL'], inplace=True)
 df.sort_values(['Instituicao', 'Data'], inplace=True)
 
 # 2. Divisao Temporal (Prevenir Lookahead Bias)
-split_date = '2023-01-01'
+split_date = '2017-01-01'
 df_train = df[df['Data'] < split_date].copy()
 df_test = df[df['Data'] >= split_date].copy()
 
