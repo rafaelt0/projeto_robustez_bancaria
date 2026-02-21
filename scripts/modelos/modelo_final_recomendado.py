@@ -78,12 +78,21 @@ y = df_clean['Estresse_Alto_P90']
 X_scaled = (X - X.mean()) / X.std()
 X_scaled = sm.add_constant(X_scaled)
 
-# 5. Ajustar modelo
+# 5. Ajustar modelo com Pesos de Classe (Weighted Logit)
 print(f"\n{'='*100}")
-print(f"AJUSTANDO MODELO FINAL")
+print(f"AJUSTANDO MODELO FINAL (WEIGHTED GLM)")
 print(f"{'='*100}")
 
-model_final = sm.Logit(y, X_scaled).fit(method='bfgs', maxiter=1000, disp=True)
+# Calcular pesos (inverso da frequencia das classes)
+counts = y.value_counts()
+weight_normal = 1.0
+weight_stress = counts[0] / counts[1]
+weights = y.apply(lambda x: weight_stress if x == 1 else weight_normal)
+
+print(f"Pesos calculados -> Normal: {weight_normal:.1f}, Estresse: {weight_stress:.1f}")
+
+# Usar GLM para permitir pesos
+model_final = sm.GLM(y, X_scaled, family=sm.families.Binomial(), var_weights=weights).fit()
 
 # 6. Exibir resultados
 print(f"\n{'='*100}")
@@ -96,18 +105,23 @@ df_clean['Prob_Estresse'] = model_final.predict(X_scaled)
 df_clean['Log_Odds_Estresse'] = np.log(df_clean['Prob_Estresse'] / (1 - df_clean['Prob_Estresse'] + 1e-10))
 df_clean['Score_Robustez'] = -df_clean['Log_Odds_Estresse']
 
-# 8. Métricas de performance com threshold otimizado (0.175)
-threshold_decision = 0.175
+# 8. Métricas de performance com threshold otimizado (0.60)
+threshold_decision = 0.60
 y_pred_prob = df_clean['Prob_Estresse']
 y_pred_class = (y_pred_prob > threshold_decision).astype(int)
 
 auc_score = roc_auc_score(y, y_pred_prob)
 
-print(f"\n{'='*100}")
-print(f"METRICAS DE PERFORMANCE (Threshold = {threshold_decision})")
-print(f"{'='*100}")
+# Pseudo R2 aproximado para GLM (McFadden)
+def calculate_pseudo_r2(model, y, weights):
+    # Log-likelihood do modelo nulo
+    null_model = sm.GLM(y, np.ones(len(y)), family=sm.families.Binomial(), var_weights=weights).fit()
+    return 1 - (model.llf / null_model.llf)
+
+pseudo_r2 = calculate_pseudo_r2(model_final, y, weights)
+
 print(f"AUC-ROC: {auc_score:.4f}")
-print(f"Pseudo R2: {model_final.prsquared:.4f}")
+print(f"Pseudo R2 (Weighted): {pseudo_r2:.4f}")
 print(f"Log-Likelihood: {model_final.llf:.2f}")
 print(f"\nMatriz de Confusao:")
 classification_metrics = classification_report(y, y_pred_class, target_names=['Normal', 'Estresse'], output_dict=True)
@@ -118,7 +132,7 @@ perf_metrics = pd.DataFrame({
     'Metric': ['AUC', 'Pseudo_R2', 'Log_Likelihood', 'Recall', 'Precision', 'F1_Score', 'Accuracy'],
     'Value': [
         auc_score,
-        model_final.prsquared,
+        pseudo_r2,
         model_final.llf,
         classification_metrics['Estresse']['recall'],
         classification_metrics['Estresse']['precision'],
@@ -267,8 +281,9 @@ print(f"{'='*100}")
 print(f"""
 MODELO FINAL - ESPECIFICACOES:
 - Variaveis: 7 principais + 1 interacao (SEM IPCA)
+- Metodo: GLM com Pesos de Classe (Balanceado)
 - AUC-ROC: {auc_score:.4f}
-- Pseudo R2: {model_final.prsquared:.4f}
+- Pseudo R2 (Weighted): {pseudo_r2:.4f}
 - Threshold de decisao: {threshold_decision}
 - Recall: {classification_report(y, y_pred_class, output_dict=True)['1']['recall']:.1%}
 - Precision: {classification_report(y, y_pred_class, output_dict=True)['1']['precision']:.1%}

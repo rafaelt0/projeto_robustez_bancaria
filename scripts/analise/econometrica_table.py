@@ -35,8 +35,8 @@ def generate_econometrica_table():
     df['NPL_Volatility_8Q'] = df.groupby('Instituicao')['NPL'].transform(lambda x: x.rolling(8, 4).std())
     df['NPL_Volatility_8Q'] = df['NPL_Volatility_8Q'].fillna(df['NPL_Volatility_8Q'].mean())
     
-    LAG = 1
-    core_features = ['Capital_Principal', 'Alavancagem', 'PIB', 'Spread', 'Desemprego', 'Selic', 'NPL_Volatility_8Q']
+    LAG = 4
+    core_features = ['RWA_Credito', 'RWA_Mercado', 'RWA_Operacional', 'Capital_Principal', 'Alavancagem', 'PIB', 'Spread', 'Desemprego', 'Selic', 'NPL_Volatility_8Q']
     df_model = df.copy()
     features = []
     for f in core_features:
@@ -44,27 +44,42 @@ def generate_econometrica_table():
         df_model[name] = df_model.groupby('Instituicao')[f].shift(LAG)
         features.append(name)
     
+    # Add interaction term
+    df_model['RWA_Operacional_lag4_x_Alavancagem_lag4'] = df_model['RWA_Operacional_lag4'] * df_model['Alavancagem_lag4']
+    
+    # Update feature list for FE (keeping consistent with main model)
+    features_ext = features + ['RWA_Operacional_lag4_x_Alavancagem_lag4']
+    
     threshold_p90 = df_model['NPL'].quantile(0.90)
     df_model['Target'] = (df_model['NPL'] > threshold_p90).astype(int)
     
     # Filter for FE
     inst_variance = df_model.groupby('Instituicao')['Target'].std()
     eligible = inst_variance[inst_variance > 0].index
-    df_fe = df_model[df_model['Instituicao'].isin(eligible)].dropna(subset=features + ['Target']).copy()
+    df_fe = df_model[df_model['Instituicao'].isin(eligible)].dropna(subset=features_ext + ['Target']).copy()
     
-    # Regression
+    # Regression with Class Weights
     dummies = pd.get_dummies(df_fe['Instituicao'], prefix='FE', drop_first=True)
-    X_main = df_fe[features]
+    X_main = df_fe[features_ext]
     X_scaled = (X_main - X_main.mean()) / X_main.std()
     X = pd.concat([X_scaled, dummies], axis=1).astype(float)
     X = sm.add_constant(X)
     y = df_fe['Target'].astype(float)
     
-    res = sm.Logit(y, X).fit(method='bfgs', maxiter=1000, disp=False)
+    # Calculate weights for FE set
+    counts = y.value_counts()
+    weight_stress = counts[0] / counts[1]
+    weights = y.apply(lambda x: weight_stress if x == 1 else 1.0)
+    
+    res = sm.GLM(y, X, family=sm.families.Binomial(), var_weights=weights).fit()
+    
+    # Pseudo R2 for GLM
+    null_res = sm.GLM(y, np.ones(len(y)), family=sm.families.Binomial(), var_weights=weights).fit()
+    pseudo_r2 = 1 - (res.llf / null_res.llf)
     
     # Extract only main variables for the table
     summary_data = []
-    for f in ['const'] + features:
+    for f in ['const'] + features_ext:
         coef = res.params[f]
         std_err = res.bse[f]
         p_val = res.pvalues[f]
@@ -74,7 +89,9 @@ def generate_econometrica_table():
         elif p_val < 0.05: stars = "**"
         elif p_val < 0.10: stars = "*"
         
-        summary_data.append([f.replace('_lag1', ''), f"{coef:.4f}{stars}", f"({std_err:.4f})"])
+        # Clean up name for latex
+        display_name = f.replace('_lag4', '').replace('_', ' ')
+        summary_data.append([display_name, f"{coef:.4f}{stars}", f"({std_err:.4f})"])
 
     print("Results computed. Generating LaTeX table...")
     
@@ -97,7 +114,7 @@ def generate_econometrica_table():
 
     latex_out += "\\midrule\n"
     latex_out += f"Num. Observações & {int(res.nobs)} \\\\\n"
-    latex_out += f"Pseudo $R^2$ & {res.prsquared:.4f} \\\\\n"
+    latex_out += f"Pseudo $R^2$ (Weighted) & {pseudo_r2:.4f} \\\\\n"
     latex_out += f"Log-Verossimilhança & {res.llf:.2f} \\\\\n"
     latex_out += f"Número de Entidades & {len(eligible)} \\\\\n"
     latex_out += "Efeitos Fixos & SIM \\\\\n"

@@ -70,7 +70,7 @@ latex_table1 += r"""    \hline
 latex_table2 = r"""
 \begin{table}[htbp]
   \centering
-  \caption{Desempenho Preditivo do Modelo (Limiar = 0.175)}
+  \caption{Desempenho Preditivo do Modelo (Limiar = 0.60)}
   \label{tab:performance}
   \begin{tabular}{lc}
     \hline
