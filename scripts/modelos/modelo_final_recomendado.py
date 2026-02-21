@@ -242,12 +242,19 @@ summary_score.to_csv(ranking_csv, index=False)
 risk_summary.to_csv(risk_csv, index=False)
 odds_ratios.to_csv(stats_csv, index=False)
 
-# 13. Gráficos
+# 12. Visualização de Performance (Geral)
+from sklearn.metrics import roc_curve, precision_recall_curve, auc
+
+fpr, tpr, _ = roc_curve(df_clean['Estresse_Alto_P90'], df_clean['Prob_Estresse'])
+roc_auc = auc(fpr, tpr)
+
+prec, rec, _ = precision_recall_curve(df_clean['Estresse_Alto_P90'], df_clean['Prob_Estresse'])
+pr_auc = auc(rec, prec)
+
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
 # ROC Curve
-fpr, tpr, _ = roc_curve(y, y_pred_prob)
-axes[0, 0].plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC (AUC = {auc_score:.4f})')
+axes[0, 0].plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC (AUC = {roc_auc:.4f})')
 axes[0, 0].plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
 axes[0, 0].set_xlabel('False Positive Rate')
 axes[0, 0].set_ylabel('True Positive Rate')
