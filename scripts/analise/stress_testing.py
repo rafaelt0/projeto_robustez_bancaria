@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import statsmodels.api as sm
 import os
 
 def run_stress_testing():
@@ -8,40 +7,40 @@ def run_stress_testing():
     print("INICIANDO ANALISE DE STRESS TESTING (CENARIOS 2025)")
     print("="*80)
 
-    # 1. Carregar Dados e Modelo
+    # 1. Carregar Dados
     raw_path = 'dados/brutos/painel_final.csv'
     if not os.path.exists(raw_path):
         print(f"Erro: Arquivo {raw_path} nao encontrado.")
         return
 
     df = pd.read_csv(raw_path)
+    # Converter colunas para numerico
+    cols_num = ['RWA_Credito', 'RWA_Mercado', 'RWA_Operacional', 'Capital_Principal', 'Alavancagem', 'PIB', 'Spread']
+    for c in cols_num:
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+    
     df['Data'] = pd.to_datetime(df['Data'])
+    
+    # Preencher lacunas macro (PIB/Spread costumam vir trimestrais)
+    df.sort_values(['Instituicao', 'Data'], inplace=True)
+    # Forward fill global para macro (ja que sao valores do sistema)
+    df['PIB'] = df['PIB'].ffill()
+    df['Spread'] = df['Spread'].ffill()
     
     # Pegar o trimestre mais recente disponível para cada instituição como base
     last_date = df['Data'].max()
-    df_base = df[df['Data'] == last_date].copy()
+    # Filtrar apenas instituições que possuem dados de RWA no último trimestre
+    df_base = df[df['Data'] == last_date].copy().dropna(subset=['Instituicao', 'RWA_Credito'])
     
-    print(f"Usando dados de {last_date.date()} como base para simulação.")
+    print(f"Usando dados de {last_date.date()} como base para simulação ({len(df_base)} instituições).")
 
-    # 2. Definir Parâmetros (Devem vir do modelo_final_recomendado.py)
-    # Variáveis: RWA_Credito, RWA_Mercado, RWA_Operacional, Capital_Principal, Alavancagem, PIB, Spread
-    # Interação: RWA_Operacional_lag4_x_Alavancagem_lag4
-    
-    # Coeficientes do Modelo (Extraídos do último run bem-sucedido)
-    # Nota: Em um sistema real, salvaríamos o modelo com Pickle. Aqui replicamos para agilidade.
+    # 2. Definição de Coeficientes e Scaling (Exato como no modelo)
     coefs = {
-        'const': -21.4909,
-        'RWA_Credito_lag4': -79.1330,
-        'RWA_Mercado_lag4': 1.1895,
-        'RWA_Operacional_lag4': 0.8966,
-        'Capital_Principal_lag4': -0.0770,
-        'Alavancagem_lag4': -0.5944,
-        'PIB_lag4': 0.0981,
-        'Spread_lag4': 0.4314,
+        'const': -21.4909, 'RWA_Credito_lag4': -79.1330, 'RWA_Mercado_lag4': 1.1895,
+        'RWA_Operacional_lag4': 0.8966, 'Capital_Principal_lag4': -0.0770,
+        'Alavancagem_lag4': -0.5944, 'PIB_lag4': 0.0981, 'Spread_lag4': 0.4314,
         'RWA_Operacional_lag4_x_Alavancagem_lag4': 2.6068
     }
-
-    # Parâmetros de Scaling Reais (Treino 2016-2021)
     X_mean = {
         'RWA_Credito_lag4': 47893019.866, 'RWA_Mercado_lag4': 1062413.580, 
         'RWA_Operacional_lag4': 5042233.430, 'Capital_Principal_lag4': 0.1910,
@@ -56,8 +55,6 @@ def run_stress_testing():
     }
 
     def calculate_risk(row, pib_shock=0.0, spread_shock=0.0, capital_shock=1.0):
-        # 1. Preparar variáveis (Simulando Lags com os dados atuais mais recentes)
-        # Nota: Usamos os valores atuais como proxies para os valores em t-4 na simulação
         v = {
             'RWA_Credito_lag4': row.get('RWA_Credito', 0),
             'RWA_Mercado_lag4': row.get('RWA_Mercado', 0),
@@ -69,31 +66,31 @@ def run_stress_testing():
         }
         v['RWA_Operacional_lag4_x_Alavancagem_lag4'] = v['RWA_Operacional_lag4'] * v['Alavancagem_lag4']
 
-        # 2. Scaling (Z-score)
         v_scaled = {}
         for k in v:
-            v_scaled[k] = (v[k] - X_mean[k]) / X_std[k]
+            # Evitar NaNs residuais
+            val = v[k] if (pd.notnull(v[k]) and not np.isnan(v[k])) else X_mean[k]
+            v_scaled[k] = (val - X_mean[k]) / (X_std[k] if X_std[k] != 0 else 1.0)
 
-        # 3. Log-Odds
         log_odds = coefs['const']
         for k in v_scaled:
-            log_odds += coefs[k] * v_scaled[k]
+            log_odds += coefs.get(k, 0) * v_scaled[k]
         
-        prob = 1 / (1 + np.exp(-log_odds))
-        return prob
+        # Clip para evitar overflow no exp
+        return 1 / (1 + np.exp(-np.clip(log_odds, -20, 20)))
 
     # 3. Processar Cenários
     print("\nSimulando Cenários...")
     
     # Baseline
-    print("Baseline:")
     df_base['Prob_Baseline'] = df_base.apply(lambda r: calculate_risk(r), axis=1)
     
     # Stress Severo (-3% PIB, +2% Spread, -15% Capital)
-    print("Stress Severo:")
-    df_base['Prob_Stress_Severo'] = df_base.apply(lambda r: calculate_risk(r, pib_shock=-0.03, spread_shock=0.02, capital_shock=0.85), axis=1)
+    # PIB_shock = -3.0 (ja que PIB base eh ~166)
+    df_base['Prob_Stress_Severo'] = df_base.apply(lambda r: calculate_risk(r, pib_shock=-3.0, spread_shock=2.0, capital_shock=0.85), axis=1)
     
     # Impacto no Score
+    # Score de robustez = -log(odds)
     df_base['Score_Baseline'] = -np.log(df_base['Prob_Baseline'] / (1 - df_base['Prob_Baseline'] + 1e-10))
     df_base['Score_Stress'] = -np.log(df_base['Prob_Stress_Severo'] / (1 - df_base['Prob_Stress_Severo'] + 1e-10))
     df_base['Queda_Resiliencia'] = df_base['Score_Stress'] - df_base['Score_Baseline']
@@ -112,7 +109,8 @@ def run_stress_testing():
     generate_latex_table(df_stress)
 
 def generate_latex_table(df):
-    top_affected = df.head(15) # Os que mais perderam resiliência
+    top_affected = df.head(15) # Os que mais perderam resiliência (queda mais negativa)
+    least_affected = df.tail(10).iloc[::-1] # Os que menos perderam (mais estáveis), invertendo para mostrar o melhor primeiro
     
     latex = """
 % ==========================================================
@@ -126,15 +124,32 @@ def generate_latex_table(df):
     \\hline
     \\textbf{Instituição} & \\textbf{Prob. Baseline} & \\textbf{Prob. Stress} & \\textbf{Impacto no Score} \\\\
     \\hline
+    \\multicolumn{4}{l}{\\textbf{Painel A: 15 Instituições Mais Vulneráveis (Maior Queda no Score)}} \\\\
+    \\hline
 """
     for _, row in top_affected.iterrows():
-        latex += f"    {row['Instituicao'][:30]} & {row['Prob_Baseline']:.2%} & {row['Prob_Stress_Severo']:.2%} & {row['Queda_Resiliencia']:.2f} \\\\\n"
+        inst = row['Instituicao'].replace('&', '\\&').replace('_', '\\_')[:30]
+        prob_b = row['Prob_Baseline'] if not np.isnan(row['Prob_Baseline']) else 0.0
+        prob_s = row['Prob_Stress_Severo'] if not np.isnan(row['Prob_Stress_Severo']) else 0.0
+        impact = row['Queda_Resiliencia'] if not np.isnan(row['Queda_Resiliencia']) else 0.0
+        latex += f"    {inst} & {prob_b:.2%} & {prob_s:.2%} & {impact:.2f} \\\\\n"
     
+    latex += """    \\hline
+    \\multicolumn{4}{l}{\\textbf{Painel B: 10 Instituições Mais Resilientes (Menor Impacto no Score)}} \\\\
+    \\hline
+"""
+    for _, row in least_affected.iterrows():
+        inst = row['Instituicao'].replace('&', '\\&').replace('_', '\\_')[:30]
+        prob_b = row['Prob_Baseline'] if not np.isnan(row['Prob_Baseline']) else 0.0
+        prob_s = row['Prob_Stress_Severo'] if not np.isnan(row['Prob_Stress_Severo']) else 0.0
+        impact = row['Queda_Resiliencia'] if not np.isnan(row['Queda_Resiliencia']) else 0.0
+        latex += f"    {inst} & {prob_b:.2%} & {prob_s:.2%} & {impact:.2f} \\\\\n"
+
     latex += """    \\hline
   \\end{tabular}
 \\end{table}
 """
-    with open('resultados/relatorios/tabela_stress_test.tex', 'w') as f:
+    with open('resultados/relatorios/tabela_stress_test.tex', 'w', encoding='utf-8') as f:
         f.write(latex)
     print("Tabela LaTeX de Stress Test gerada com sucesso.")
 
