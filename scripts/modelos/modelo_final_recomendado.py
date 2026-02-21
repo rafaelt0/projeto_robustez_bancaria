@@ -131,8 +131,13 @@ def get_performance(X_data, y_data):
 auc_train, rep_train, probs_train = get_performance(X_train_scaled, y_train)
 auc_test, rep_test, probs_test = get_performance(X_test_scaled, y_test)
 
-df_final_test['Prob_Estresse'] = probs_test
-df_final_test['Score_Robustez'] = -np.log(probs_test / (1 - probs_test + 1e-10))
+# Calcular probabilidades para TODO o dataset (para ranking e alertas)
+X_all = df_clean[lag_cols + ['RWA_Operacional_lag4_x_Alavancagem_lag4']]
+X_all_scaled = (X_all - X_mean) / X_std
+X_all_scaled = sm.add_constant(X_all_scaled)
+
+df_clean['Prob_Estresse'] = model_final.predict(X_all_scaled)
+df_clean['Score_Robustez'] = -np.log(df_clean['Prob_Estresse'] / (1 - df_clean['Prob_Estresse'] + 1e-10))
 
 # Pseudo R2 para GLM (McFadden)
 def calculate_pseudo_r2(model, y, w):
