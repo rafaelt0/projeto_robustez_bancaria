@@ -19,6 +19,7 @@ def main():
     scripts = [
         "scripts/modelos/modelo_final_recomendado.py",
         "scripts/analise/econometrica_table.py",
+        "scripts/analise/stress_testing.py",
         "scripts/analise/gerar_tabelas_latex.py"
     ]
 

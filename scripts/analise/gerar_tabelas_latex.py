@@ -182,6 +182,21 @@ try:
 except Exception as e:
     print(f"Erro ao anexar tabela econometrica: {e}")
 
+# Adicionar a Tabela de Stress Test
+try:
+    with open('resultados/relatorios/tabela_stress_test.tex', 'r', encoding='utf-8') as f:
+        tabela_stress = f.read()
+    
+    with open(output_path, 'a', encoding='utf-8') as f:
+        f.write("\n\n% ==========================================================\n")
+        f.write("% TABELA DE RESULTADOS DO STRESS TEST (CENARIOS)\n")
+        f.write("% ==========================================================\n\n")
+        f.write(tabela_stress)
+        
+    print("Tabela de Stress Test anexada com sucesso.")
+except Exception as e:
+    print(f"Erro ao anexar tabela stress test: {e}")
+
 # Fechar documento LaTeX
 with open(output_path, 'a', encoding='utf-8') as f:
     f.write("\n\\end{document}\n")
