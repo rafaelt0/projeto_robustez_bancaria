@@ -1,55 +1,51 @@
 \begin{table}[htbp]
 \centering
-\caption{Determinantes do Estresse Bancário: Estimativas Logit com Efeitos Fixos}
-\label{tab:fe_logit}
+\caption{Determinantes do Estresse Bancário (Logit com Efeitos Fixos e Desemprego)}
+\label{tab:fe_logit_v2}
 \begin{tabular}{lc}
 \toprule
 \textbf{Variável} & \textbf{Coeficiente} \\
                   & \textbf{(Erro Padrão)} \\
 \midrule
-const & -5.0560*** \\
- & (1.0034) \\
+const & -4.8392*** \\
+ & (0.9853) \\
 \addlinespace
-RWA Credito & -0.2024 \\
- & (0.2033) \\
+RWA Credito & -0.1916 \\
+ & (0.2026) \\
 \addlinespace
-RWA Mercado & 0.0030 \\
- & (0.1446) \\
+RWA Mercado & 0.0065 \\
+ & (0.1392) \\
 \addlinespace
-RWA Operacional & 0.0075 \\
- & (0.3175) \\
+RWA Operacional & 0.0619 \\
+ & (0.3152) \\
 \addlinespace
-Capital Principal & 0.2977 \\
- & (0.1886) \\
+Capital Principal & 0.2398 \\
+ & (0.1855) \\
 \addlinespace
-Alavancagem & -0.0989 \\
- & (0.2526) \\
+Alavancagem & 0.0571 \\
+ & (0.2468) \\
 \addlinespace
-PIB & 0.1761 \\
- & (0.2170) \\
+PIB & 0.1305 \\
+ & (0.2012) \\
 \addlinespace
-Spread & -0.3890*** \\
- & (0.1371) \\
+Spread & -0.1502 \\
+ & (0.1149) \\
 \addlinespace
-Desemprego & -0.0267 \\
- & (0.2415) \\
+Desemprego & -0.3961** \\
+ & (0.2003) \\
 \addlinespace
-Selic & 0.5445*** \\
- & (0.1655) \\
+NPL Volatility 8Q & -0.0166 \\
+ & (0.1297) \\
 \addlinespace
-NPL Volatility 8Q & -0.0251 \\
- & (0.1320) \\
-\addlinespace
-RWA Operacional x Alavancagem & -8.3089*** \\
- & (2.6011) \\
+RWA Operacional x Alavancagem & -9.1011*** \\
+ & (2.5671) \\
 \addlinespace
 \midrule
-Num. Observações & 730 \\
-Pseudo $R^2$ (Weighted) & 0.3545 \\
-Log-Verossimilhança & -454.57 \\
-Número de Entidades & 49 \\
+Observações & 730 \\
+Pseudo $R^2$ & 0.3469 \\
+Número de Inst. & 49 \\
 Efeitos Fixos & SIM \\
 \bottomrule
-\multicolumn{2}{l}{\small \textit{Notas:} *** $p<0.01$, ** $p<0.05$, * $p<0.1$. Erros padrão entre parênteses.} \\
+\multicolumn{2}{l}{\small Notas: *** p<0.01, ** p<0.05, * p<0.1.} \\
 \end{tabular}
 \end{table}
