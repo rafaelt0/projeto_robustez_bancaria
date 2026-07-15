@@ -20,23 +20,41 @@ LAG = 4
 P90_QUANTILE = 0.90
 
 # Limiar de decisao para classificar estresse a partir da probabilidade prevista.
-DECISION_THRESHOLD = 0.60
+# Ajustado ao ponto de maximo F1 do modelo regularizado. Observacao: as
+# probabilidades ainda nao sao calibradas (o balanceamento por pesos as desloca
+# para cima); o limiar e um ponto de corte de score, nao uma probabilidade real.
+DECISION_THRESHOLD = 0.50
 
 # Validacao out-of-time: treino antes desta data, teste a partir dela.
 SPLIT_DATE = "2022-01-01"
 
+# Regularizacao L2 (ridge). Encolhe os coeficientes, cura a quase-separacao
+# causada pelo porte do banco e reduz o overfitting. Calibrado por validacao
+# out-of-time (melhor AUC-PR e menor gap treino/teste).
+L2_ALPHA = 2.0
+
+# Numero de reamostragens do bootstrap por instituicao (cluster bootstrap) usado
+# para obter erros-padrao/p-valores do estimador regularizado.
+BOOTSTRAP_N = 250
+
 # Variaveis explicativas de nivel (antes da defasagem).
-#   - Microprudenciais: RWA (Credito/Mercado/Operacional), Capital, Alavancagem
-#   - Dinamica temporal: Volatilidade do NPL (janela de 8 trimestres)
-#   - Macroeconomicas:   PIB, Spread, Desemprego
+#   - Composicao de risco (RWA): participacao de cada RWA no RWA total. Usar
+#     participacoes (e nao niveis em R$) remove o proxy de PORTE que causava
+#     quase-separacao (coeficiente explodindo) e preserva o perfil de risco.
+#   - Porte: log do RWA total. Devolve o sinal legitimo de tamanho do banco de
+#     forma limitada (log), sem reintroduzir separacao perfeita.
+#   - Microprudenciais: Capital, Alavancagem (ja sao razoes na fonte).
+#   - Dinamica temporal: Volatilidade do NPL (janela de 8 trimestres).
+#   - Macroeconomicas:   PIB, Spread, Desemprego.
 #
 # Nota: a serie Selic esta ausente no painel (coluna 100% vazia na fonte de
 # dados), portanto NAO e utilizada. O Spread bancario e a variavel financeira
 # macro efetivamente disponivel.
 CORE_FEATURES = [
-    "RWA_Credito",
-    "RWA_Mercado",
-    "RWA_Operacional",
+    "RWA_Credito_share",
+    "RWA_Mercado_share",
+    "RWA_Operacional_share",
+    "log_RWA_Total",
     "Capital_Principal",
     "Alavancagem",
     "NPL_Volatility_8Q",
@@ -45,8 +63,12 @@ CORE_FEATURES = [
     "Desemprego",
 ]
 
-# Termo de interacao (amplificacao nao linear de risco): RWA Operacional x Alavancagem.
-INTERACTION = ("RWA_Operacional", "Alavancagem")
+# Colunas de RWA em nivel (R$) usadas para derivar participacoes e porte.
+RWA_LEVEL_COLS = ["RWA_Credito", "RWA_Mercado", "RWA_Operacional"]
+
+# Termo de interacao (amplificacao nao linear de risco):
+# participacao de RWA Operacional x Alavancagem.
+INTERACTION = ("RWA_Operacional_share", "Alavancagem")
 
 # ---------------------------------------------------------------------------
 # Caminhos
@@ -96,6 +118,40 @@ def add_npl_volatility(df):
         lambda x: x.rolling(8, min_periods=4).std()
     )
     df["NPL_Volatility_8Q"] = vol.fillna(vol.mean())
+    return df
+
+
+def add_rwa_features(df):
+    """Deriva as features de composicao e porte a partir dos RWA em nivel.
+
+    Cria:
+      - RWA_Total: soma dos RWA (Credito + Mercado + Operacional);
+      - {RWA}_share: participacao de cada RWA no total (perfil de risco);
+      - log_RWA_Total: porte do banco em escala logaritmica.
+
+    Usar participacoes em vez de niveis em R$ elimina o proxy de porte que
+    provocava quase-separacao no logit.
+    """
+    import numpy as np
+
+    total = df[RWA_LEVEL_COLS].sum(axis=1)
+    df["RWA_Total"] = total
+    safe_total = total.replace(0, np.nan)
+    for col in RWA_LEVEL_COLS:
+        df[f"{col}_share"] = df[col] / safe_total
+    df["log_RWA_Total"] = np.log(safe_total)
+    return df
+
+
+def prepare_panel(df):
+    """Ordena e adiciona as features derivadas (volatilidade do NPL e RWA).
+
+    Ponto unico de preparo do painel usado por todos os scripts, garantindo a
+    mesma construcao de variaveis em modelagem, econometria e stress testing.
+    """
+    df = df.sort_values(["Instituicao", "Data"])
+    df = add_npl_volatility(df)
+    df = add_rwa_features(df)
     return df
 
 

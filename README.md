@@ -88,10 +88,17 @@ período de treino** (≈ 16.76% na base atual), evitando vazamento do futuro.
 
 ### 🔎 Variáveis Explicativas
 
-**Microprudenciais**
-- RWA Crédito
-- RWA Mercado
-- RWA Operacional
+**Composição de risco (RWA)**
+- Participação do RWA de Crédito no RWA total
+- Participação do RWA de Mercado no RWA total
+- Participação do RWA Operacional no RWA total
+
+> ℹ️ Os RWA entram como **participações** (e não em nível, R$) para remover o
+> proxy de *porte* que provocava quase-separação no logit. O porte legítimo é
+> capturado separadamente pelo **log do RWA total**.
+
+**Porte e microprudenciais**
+- Log do RWA total (tamanho do banco)
 - Capital Principal
 - Alavancagem
 
@@ -108,20 +115,31 @@ período de treino** (≈ 16.76% na base atual), evitando vazamento do futuro.
 > efetivamente disponível.
 
 **Interações**
-- RWA Operacional × Alavancagem  
+- RWA Operacional (participação) × Alavancagem  
   (Amplificação não linear de risco)
+
+**Estimação:** Logit (GLM binomial) com **regularização L2 (ridge)** para conter
+a quase-separação e o overfitting. Como o estimador regularizado não fornece
+erros-padrão analíticos, a inferência (erro-padrão, z, p-valor) é obtida por
+**bootstrap por instituição** (respeitando a estrutura de painel).
 
 ---
 
 ## 📈 Performance
 
 Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
-decisão 0.60. Valores regenerados automaticamente em
+decisão 0.50. Valores regenerados automaticamente em
 `resultados/relatorios/modelo_final_performance.csv`.
 
 | Métrica | Valor |
 |---------|-------|
-| AUC-ROC (Treino) | 0.8739 |
-| AUC-ROC (Teste OOT) | 0.7602 |
-| Pseudo R² (McFadden) | 0.3821 |
-| Recall (Teste @0.60) | 53.6% |
+| AUC-ROC (Treino) | 0.8198 |
+| AUC-ROC (Teste OOT) | 0.7431 |
+| AUC-PR (Teste OOT) | 0.1823 *(baseline 0.059)* |
+| Pseudo R² (McFadden) | 0.1217 |
+| Recall (Teste @0.50) | 51.9% |
+
+> ⚠️ **Calibração pendente:** o balanceamento por pesos desloca as probabilidades
+> para cima (média prevista ≈ 0.46 vs. taxa real ≈ 0.06). As probabilidades devem
+> ser lidas como **score de ordenação de risco**, não como probabilidades
+> literais. A calibração (ex.: Platt/isotonic) é o próximo passo recomendado.

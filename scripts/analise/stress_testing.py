@@ -87,8 +87,10 @@ def run_stress_testing():
     coefs, X_mean, X_std = load_model_params()
 
     df = pd.read_csv(config.RAW_PANEL)
-    num_cols = [c for c in config.CORE_FEATURES if c != "NPL_Volatility_8Q"] + ["NPL"]
-    for c in num_cols:
+    raw_cols = config.RWA_LEVEL_COLS + [
+        "Capital_Principal", "Alavancagem", "PIB", "Spread", "Desemprego", "NPL",
+    ]
+    for c in raw_cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
@@ -97,7 +99,9 @@ def run_stress_testing():
     for c in ["PIB", "Spread", "Desemprego"]:
         if c in df.columns:
             df[c] = df[c].ffill()
+    # Deriva volatilidade do NPL e features de RWA (participacoes + porte).
     df = config.add_npl_volatility(df)
+    df = config.add_rwa_features(df)
 
     last_date = df["Data"].max()
     df_base = df[df["Data"] == last_date].copy().dropna(subset=["Instituicao", "RWA_Credito"])

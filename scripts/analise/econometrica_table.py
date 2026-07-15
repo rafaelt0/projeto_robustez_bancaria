@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+from scipy.stats import norm
 import os
 import sys
 
@@ -29,8 +30,9 @@ def generate_econometrica_table():
         if col in df.columns:
             df[col] = df.groupby('Instituicao')[col].ffill().bfill()
 
-    # Volatilidade do NPL (proxy de risco dinamico) via config
+    # Features derivadas (volatilidade do NPL + participacoes/porte de RWA)
     df = config.add_npl_volatility(df)
+    df = config.add_rwa_features(df)
 
     # 3. Lags e interacao (mesma especificacao do modelo final)
     df_model, features_ext = config.build_lagged_features(df.copy())
@@ -48,29 +50,65 @@ def generate_econometrica_table():
         print("Erro: Nenhum dado elegivel para Efeitos Fixos.")
         return
 
-    # Regression com Pesos (Balanceamento)
-    dummies = pd.get_dummies(df_fe['Instituicao'], prefix='FE', drop_first=True)
-    X_main = df_fe[features_ext]
-    X_scaled = (X_main - X_main.mean()) / X_main.std()
-    X = pd.concat([X_scaled, dummies], axis=1).astype(float)
-    X = sm.add_constant(X)
+    # Padronizacao das variaveis principais e dummies de efeito fixo.
+    # O logit FE com muitas dummies + evento raro separa perfeitamente, entao
+    # usa-se regularizacao L2 (ridge), como no modelo principal. A penalidade
+    # nao se aplica ao intercepto (primeira coluna).
+    mean, std = df_fe[features_ext].mean(), df_fe[features_ext].std()
+
+    def build_design(sub):
+        Xs = (sub[features_ext] - mean) / std
+        dums = pd.get_dummies(sub['Instituicao'], prefix='FE', drop_first=True)
+        return sm.add_constant(pd.concat([Xs, dums], axis=1).astype(float), has_constant='add')
+
+    def fit_fe_ridge(X, y):
+        alpha = np.array([0.0] + [config.L2_ALPHA] * (X.shape[1] - 1))
+        w = y.map({0: 1.0, 1: (y == 0).sum() / (y == 1).sum()})
+        return sm.GLM(y, X, family=sm.families.Binomial(), var_weights=w).fit_regularized(
+            alpha=alpha, L1_wt=0.0
+        )
+
+    X = build_design(df_fe)
     y = df_fe['Target'].astype(float)
-    
-    counts = y.value_counts()
-    weight_stress = counts[0] / counts[1]
-    weights = y.apply(lambda x: weight_stress if x == 1 else 1.0)
-    
-    res = sm.GLM(y, X, family=sm.families.Binomial(), var_weights=weights).fit()
-    
-    null_res = sm.GLM(y, np.ones(len(y)), family=sm.families.Binomial(), var_weights=weights).fit()
-    pseudo_r2 = 1 - (res.llf / null_res.llf)
-    
+    res = fit_fe_ridge(X, y)
+
+    # Pseudo R2 de McFadden com log-verossimilhanca ponderada
+    w_full = y.map({0: 1.0, 1: (y == 0).sum() / (y == 1).sum()})
+    p_hat = np.clip(np.asarray(res.predict(X)), 1e-12, 1 - 1e-12)
+    p0 = np.average(y, weights=w_full)
+    ll_model = np.sum(w_full * (y * np.log(p_hat) + (1 - y) * np.log(1 - p_hat)))
+    ll_null = np.sum(w_full * (y * np.log(p0) + (1 - y) * np.log(1 - p0)))
+    pseudo_r2 = 1 - ll_model / ll_null
+
+    # Erros-padrao/p-valores das variaveis principais via bootstrap por instituicao.
+    # As dummies mudam a cada reamostragem (nuisance); extraem-se apenas os
+    # coeficientes das variaveis de interesse, sempre presentes.
+    keep = ['const'] + features_ext
+    groups = {i: g for i, g in df_fe.groupby('Instituicao')}
+    insts = np.array(list(groups.keys()))
+    rng = np.random.default_rng(42)
+    boot = []
+    for _ in range(config.BOOTSTRAP_N):
+        chosen = rng.choice(len(insts), size=len(insts), replace=True)
+        sub = pd.concat([groups[insts[i]] for i in chosen], ignore_index=True)
+        yb = sub['Target'].astype(float)
+        if yb.nunique() < 2:
+            continue
+        try:
+            rb = fit_fe_ridge(build_design(sub), yb)
+            boot.append(rb.params.reindex(keep).values)
+        except Exception:
+            continue
+    boot = np.array(boot, dtype=float)
+    se_map = dict(zip(keep, np.nanstd(boot, axis=0, ddof=1)))
+
     # Extract only main variables for the table
     summary_data = []
-    for f in ['const'] + features_ext:
+    for f in keep:
         coef = res.params[f]
-        std_err = res.bse[f]
-        p_val = res.pvalues[f]
+        std_err = se_map.get(f, np.nan)
+        z = coef / std_err if std_err and not np.isnan(std_err) else 0.0
+        p_val = 2 * (1 - norm.cdf(abs(z)))
         stars = "***" if p_val < 0.01 else "**" if p_val < 0.05 else "*" if p_val < 0.1 else ""
         display_name = f.replace(f'_lag{config.LAG}', '').replace('_', ' ')
         summary_data.append([display_name, f"{coef:.4f}{stars}", f"({std_err:.4f})"])
@@ -91,7 +129,7 @@ def generate_econometrica_table():
         latex_out += f"{var_name} & {row[1]} \\\\\n & {row[2]} \\\\\n\\addlinespace\n"
 
     latex_out += "\\midrule\n"
-    latex_out += f"Observações & {int(res.nobs)} \\\\\n"
+    latex_out += f"Observações & {len(y)} \\\\\n"
     latex_out += f"Pseudo $R^2$ & {pseudo_r2:.4f} \\\\\n"
     latex_out += f"Número de Inst. & {len(eligible)} \\\\\n"
     latex_out += "Efeitos Fixos & SIM \\\\\n"
