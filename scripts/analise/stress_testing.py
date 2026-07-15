@@ -32,7 +32,13 @@ def load_model_params():
     scaling = pd.read_csv(config.SCALING_CSV)
     X_mean = dict(zip(scaling["Variavel"], scaling["Mean"]))
     X_std = dict(zip(scaling["Variavel"], scaling["Std"]))
-    return coefs, X_mean, X_std
+
+    # Parametros de calibracao de Platt (probabilidade calibrada).
+    calib = None
+    if config.CALIBRATION_CSV.exists():
+        cal = pd.read_csv(config.CALIBRATION_CSV).set_index("Param")["Value"]
+        calib = (float(cal["A_slope"]), float(cal["B_intercept"]))
+    return coefs, X_mean, X_std, calib
 
 
 def apply_shock(value, shock):
@@ -43,11 +49,12 @@ def apply_shock(value, shock):
     return value + amount if kind == "add" else value * amount
 
 
-def calculate_risk(row, coefs, X_mean, X_std, shocks=None):
+def calculate_risk(row, coefs, X_mean, X_std, shocks=None, calib=None):
     """Probabilidade de estresse para uma instituicao sob um cenario de choques.
 
     ``shocks`` e um dict {feature: ('add'|'mul', valor)} sobre as variaveis de
-    nivel de config.CORE_FEATURES.
+    nivel de config.CORE_FEATURES. ``calib`` = (a, b) aplica a calibracao de
+    Platt sobre o log-odds, retornando probabilidade calibrada.
     """
     shocks = shocks or {}
 
@@ -72,6 +79,8 @@ def calculate_risk(row, coefs, X_mean, X_std, shocks=None):
         scaled = (val - mean_val) / std_val
         log_odds += coefs.get(k, 0.0) * scaled
 
+    if calib is not None:
+        return float(config.calibrated_prob(log_odds, calib[0], calib[1]))
     return 1.0 / (1.0 + np.exp(-np.clip(log_odds, -20, 20)))
 
 
@@ -84,7 +93,7 @@ def run_stress_testing():
         print(f"Erro: {config.RAW_PANEL} nao encontrado.")
         return
 
-    coefs, X_mean, X_std = load_model_params()
+    coefs, X_mean, X_std, calib = load_model_params()
 
     df = pd.read_csv(config.RAW_PANEL)
     raw_cols = config.RWA_LEVEL_COLS + [
@@ -122,13 +131,13 @@ def run_stress_testing():
     }
 
     df_base["Prob_Baseline"] = df_base.apply(
-        lambda r: calculate_risk(r, coefs, X_mean, X_std), axis=1
+        lambda r: calculate_risk(r, coefs, X_mean, X_std, calib=calib), axis=1
     )
     df_base["Prob_Stress_Severo"] = df_base.apply(
-        lambda r: calculate_risk(r, coefs, X_mean, X_std, cenario_severo), axis=1
+        lambda r: calculate_risk(r, coefs, X_mean, X_std, cenario_severo, calib=calib), axis=1
     )
     df_base["Prob_Stress_Interm"] = df_base.apply(
-        lambda r: calculate_risk(r, coefs, X_mean, X_std, cenario_sistemico), axis=1
+        lambda r: calculate_risk(r, coefs, X_mean, X_std, cenario_sistemico, calib=calib), axis=1
     )
 
     df_base["Score_Baseline"] = -np.log(

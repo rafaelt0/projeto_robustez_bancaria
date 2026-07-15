@@ -19,11 +19,11 @@ LAG = 4
 # Limiar do alvo (P90 do NPL). Calculado APENAS no periodo de treino.
 P90_QUANTILE = 0.90
 
-# Limiar de decisao para classificar estresse a partir da probabilidade prevista.
-# Ajustado ao ponto de maximo F1 do modelo regularizado. Observacao: as
-# probabilidades ainda nao sao calibradas (o balanceamento por pesos as desloca
-# para cima); o limiar e um ponto de corte de score, nao uma probabilidade real.
-DECISION_THRESHOLD = 0.50
+# Limiar de decisao aplicado sobre a PROBABILIDADE CALIBRADA (ver calibracao
+# abaixo). Ajustado ao ponto de maximo F1 out-of-time. Com as probabilidades
+# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 12%"
+# (~2x a taxa-base do evento).
+DECISION_THRESHOLD = 0.12
 
 # Validacao out-of-time: treino antes desta data, teste a partir dela.
 SPLIT_DATE = "2022-01-01"
@@ -84,6 +84,7 @@ GRAPHICS_DIR = BASE_DIR / "resultados" / "graficos"
 
 STATISTICS_CSV = REPORTS_DIR / "modelo_final_statistics.csv"
 SCALING_CSV = REPORTS_DIR / "modelo_final_scaling.csv"
+CALIBRATION_CSV = REPORTS_DIR / "modelo_final_calibration.csv"
 PERFORMANCE_CSV = REPORTS_DIR / "modelo_final_performance.csv"
 RANKING_CSV = REPORTS_DIR / "modelo_final_ranking.csv"
 
@@ -153,6 +154,18 @@ def prepare_panel(df):
     df = add_npl_volatility(df)
     df = add_rwa_features(df)
     return df
+
+
+def calibrated_prob(linear_predictor, a, b):
+    """Aplica calibracao de Platt sobre o preditor linear (log-odds bruto).
+
+    Retorna sigmoid(a * lp + b), a probabilidade calibrada. Como e monotonica
+    em ``linear_predictor``, preserva a ordenacao (AUC) do modelo.
+    """
+    import numpy as np
+
+    z = np.clip(a * np.asarray(linear_predictor) + b, -30, 30)
+    return 1.0 / (1.0 + np.exp(-z))
 
 
 def build_lagged_features(df):

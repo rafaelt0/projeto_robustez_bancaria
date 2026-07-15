@@ -4,8 +4,14 @@ Este script formata os resultados do modelo Logit consolidado (com macros e vola
 em tabelas padrão para artigos acadêmicos.
 """
 
+import os
+import sys
+
 import pandas as pd
 import numpy as np
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "utilitarios"))
+import config
 
 # 1. Dados do modelo consolidado lidos do CSV
 try:
@@ -71,7 +77,7 @@ latex_table1 += r"""    \hline
 latex_table2 = r"""
 \begin{table}[htbp]
   \centering
-  \caption{Desempenho Preditivo do Modelo (Limiar = 0.60)}
+  \caption{Desempenho Preditivo do Modelo (Limiar calibrado = """ + f"{config.DECISION_THRESHOLD:.2f}" + r""")}
   \label{tab:performance}
   \begin{tabular}{lcc}
     \hline

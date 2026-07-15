@@ -123,12 +123,18 @@ a quase-separação e o overfitting. Como o estimador regularizado não fornece
 erros-padrão analíticos, a inferência (erro-padrão, z, p-valor) é obtida por
 **bootstrap por instituição** (respeitando a estrutura de painel).
 
+**Calibração:** o balanceamento por pesos desloca as probabilidades brutas para
+cima, então aplica-se **calibração de Platt** (logística de 2 parâmetros sobre o
+log-odds, ajustada no treino). Por ser monotônica, preserva a ordenação (AUC) e
+recupera probabilidades interpretáveis — a probabilidade prevista passa a refletir
+a taxa-base real do evento.
+
 ---
 
 ## 📈 Performance
 
 Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
-decisão 0.50. Valores regenerados automaticamente em
+decisão calibrado 0.12. Valores regenerados automaticamente em
 `resultados/relatorios/modelo_final_performance.csv`.
 
 | Métrica | Valor |
@@ -137,9 +143,10 @@ decisão 0.50. Valores regenerados automaticamente em
 | AUC-ROC (Teste OOT) | 0.7431 |
 | AUC-PR (Teste OOT) | 0.1823 *(baseline 0.059)* |
 | Pseudo R² (McFadden) | 0.1217 |
-| Recall (Teste @0.50) | 51.9% |
+| Brier (Teste OOT) | 0.0691 |
+| Recall (Teste @0.12) | 45.5% |
 
-> ⚠️ **Calibração pendente:** o balanceamento por pesos desloca as probabilidades
-> para cima (média prevista ≈ 0.46 vs. taxa real ≈ 0.06). As probabilidades devem
-> ser lidas como **score de ordenação de risco**, não como probabilidades
-> literais. A calibração (ex.: Platt/isotonic) é o próximo passo recomendado.
+> ✅ **Calibração:** probabilidade média prevista ≈ 0.106 vs. taxa real ≈ 0.059
+> (Brier 0.220 → 0.069 após Platt). As probabilidades — inclusive as do stress
+> test — podem ser lidas como probabilidades reais de estresse, não apenas como
+> score relativo.

@@ -24,6 +24,8 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from scipy.stats import norm
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import brier_score_loss
 import matplotlib
 
 matplotlib.use("Agg")
@@ -143,14 +145,24 @@ def run_final_model():
     p_val = 2 * (1 - norm.cdf(np.abs(z_stat)))
     print(f"  reamostragens validas: {n_ok}/{config.BOOTSTRAP_N}")
 
-    # 7. Performance
-    probs_train = np.asarray(model_final.predict(X_train_const))
-    probs_test = np.asarray(model_final.predict(X_test_const))
+    # 7. Calibracao de Platt.
+    #    O balanceamento por pesos desloca as probabilidades brutas para cima.
+    #    Ajusta-se uma logistica (2 parametros) do rotulo real sobre o log-odds
+    #    bruto, SEM pesos, recuperando a prevalencia verdadeira do evento. Por ser
+    #    monotonica no log-odds, preserva a ordenacao (AUC) do modelo.
+    lp_train = X_train_const.values @ params.values
+    lp_test = X_test_const.values @ params.values
+    platt = LogisticRegression(C=1e6).fit(lp_train.reshape(-1, 1), y_train)
+    cal_a, cal_b = float(platt.coef_[0, 0]), float(platt.intercept_[0])
+
+    probs_train_raw = 1 / (1 + np.exp(-np.clip(lp_train, -30, 30)))
+    probs_train = config.calibrated_prob(lp_train, cal_a, cal_b)
+    probs_test = config.calibrated_prob(lp_test, cal_a, cal_b)
     preds_test = (probs_test > config.DECISION_THRESHOLD).astype(int)
 
-    # Pseudo R2 de McFadden com log-verossimilhanca ponderada
+    # Pseudo R2 de McFadden (fit do GLM, probabilidades brutas ponderadas)
     p0 = np.average(y_train, weights=weights)
-    ll_model = weighted_loglik(y_train.values, probs_train, weights.values)
+    ll_model = weighted_loglik(y_train.values, probs_train_raw, weights.values)
     ll_null = weighted_loglik(y_train.values, np.full(len(y_train), p0), weights.values)
     pseudo_r2 = 1 - ll_model / ll_null
 
@@ -159,6 +171,7 @@ def run_final_model():
         "AUC_Test": roc_auc_score(y_test, probs_test),
         "AUCPR_Test": average_precision_score(y_test, probs_test),
         "PR2_Train": pseudo_r2,
+        "Brier_Test": brier_score_loss(y_test, probs_test),
         "Recall_Test": recall_score(y_test, preds_test, zero_division=0),
         "Precision_Test": precision_score(y_test, preds_test, zero_division=0),
         "F1_Test": f1_score(y_test, preds_test, zero_division=0),
@@ -170,7 +183,9 @@ def run_final_model():
     print(f"  AUC-ROC Teste:   {metrics['AUC_Test']:.4f}  (gap {metrics['AUC_Train']-metrics['AUC_Test']:.3f})")
     print(f"  AUC-PR Teste:    {metrics['AUCPR_Test']:.4f}  (baseline {y_test.mean():.4f})")
     print(f"  Pseudo R2:       {metrics['PR2_Train']:.4f}")
-    print(f"  Recall Teste:    {metrics['Recall_Test']:.1%}")
+    print(f"  Brier Teste:     {metrics['Brier_Test']:.4f}")
+    print(f"  Calibracao:      prob media prevista {probs_test.mean():.3f} vs taxa real {y_test.mean():.3f}")
+    print(f"  Recall Teste:    {metrics['Recall_Test']:.1%}  (threshold calibrado {config.DECISION_THRESHOLD})")
     print(f"  Maior |coef|:    {params.drop('const').abs().max():.3f}")
 
     # 8. Persistir artefatos (fonte unica para os demais scripts)
@@ -194,12 +209,15 @@ def run_final_model():
     scaling_df.to_csv(config.SCALING_CSV, index=False)
 
     pd.DataFrame(
+        {"Param": ["A_slope", "B_intercept"], "Value": [cal_a, cal_b]}
+    ).to_csv(config.CALIBRATION_CSV, index=False)
+
+    pd.DataFrame(
         {"Metric": list(metrics.keys()), "Value": list(metrics.values())}
     ).to_csv(config.PERFORMANCE_CSV, index=False)
 
-    df_model["Prob_Estresse"] = np.asarray(
-        model_final.predict(sm.add_constant((df_model[features_final] - X_mean) / X_std))
-    )
+    lp_all = sm.add_constant((df_model[features_final] - X_mean) / X_std).values @ params.values
+    df_model["Prob_Estresse"] = config.calibrated_prob(lp_all, cal_a, cal_b)
     os.makedirs(config.PROCESSED_PANEL.parent, exist_ok=True)
     df_model.to_csv(config.PROCESSED_PANEL, index=False)
 
