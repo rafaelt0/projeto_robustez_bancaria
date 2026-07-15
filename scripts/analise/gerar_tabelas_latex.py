@@ -55,7 +55,8 @@ latex_table1 = r"""
 for res in model_results:
     stars = get_stars(res["PVal"])
     z_stat = res["Z_stat"]
-    line = f"    {res['Variable'].replace('_', '\\_')} & {res['Coef']:.4f}{stars} & {res['StdErr']:.4f} & {z_stat:.3f} & {res['PVal']:.4f} \\\\\n"
+    var_name = res["Variable"].replace("_", "\\_")
+    line = f"    {var_name} & {res['Coef']:.4f}{stars} & {res['StdErr']:.4f} & {z_stat:.3f} & {res['PVal']:.4f} \\\\\n"
     latex_table1 += line
 
 latex_table1 += r"""    \hline

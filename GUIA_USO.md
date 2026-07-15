@@ -25,20 +25,24 @@ Para reproduzir a análise completa do zero, siga esta ordem:
 3. `scripts/preparacao_dados/consolidar_painel_datas.py`: Consolida os arquivos baixados em um único painel de dados (`dados/consolidados/painel_completo.csv`).
 
 ### Etapa 2: Modelagem
-4. `scripts/modelos/modelo_final_recomendado.py`: Executa o modelo Logit com as variáveis selecionadas e interação RWA/Alavancagem. Gera o ranking de robustez inicial.
+4. `scripts/modelos/modelo_final_recomendado.py`: Executa o modelo Logit (lag 4 = 12 meses) com as variáveis definidas em `scripts/utilitarios/config.py` e interação RWA/Alavancagem. Grava coeficientes, parâmetros de escala, métricas de performance e o ranking de robustez.
 
 ### Etapa 3: Análise e Relatórios
-5. `scripts/analise/gerar_tabelas_latex.py`: Formata os resultados do modelo em tabelas prontas para uso no LaTeX.
-6. `scripts/analise/stress_testing.py`: (Opcional) Realiza testes de estresse com base no modelo ajustado.
+5. `scripts/analise/econometrica_table.py`: Estima a variante com Efeitos Fixos (mesma especificação) e gera a tabela econométrica.
+6. `scripts/analise/stress_testing.py`: Realiza testes de estresse **lendo os coeficientes e a escala gravados na Etapa 2** (não há parâmetros embutidos).
+7. `scripts/analise/gerar_tabelas_latex.py`: Consolida todas as tabelas em `tabelas_final_latex.txt`.
+
+> 💡 Todas as etapas 2–3 podem ser executadas de uma vez com `python run_project.py`.
+> A ordem importa: o stress test e as tabelas dependem dos CSVs gerados pela Etapa 2.
 
 ## 3. Requisitos de Ambiente
 
 - Python 3.10+
-- Bibliotecas: `pandas`, `numpy`, `statsmodels`, `scikit-learn`, `matplotlib`, `seaborn`.
+- Bibliotecas: `pandas`, `numpy`, `scipy`, `statsmodels`, `scikit-learn`, `matplotlib`, `seaborn`. O `playwright` é necessário apenas para a coleta (scraping) da Etapa 1.
 
 Para instalar as dependências:
 ```bash
-pip install pandas numpy statsmodels scikit-learn matplotlib seaborn
+pip install -r requirements.txt
 ```
 
 ## 4. Resultados Principais

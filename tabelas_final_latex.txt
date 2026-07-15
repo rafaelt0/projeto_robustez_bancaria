@@ -20,19 +20,20 @@
     \hline
     \textbf{Variável} & \textbf{Coeficiente} & \textbf{Erro Padrão} & \textbf{Estatística z} & \textbf{Valor-p} \\
     \hline
-    const & -21.4659*** & 1.2104 & -17.735 & 0.0000 \\
-    RWA\_Credito\_lag4 & -79.0757*** & 4.8740 & -16.224 & 0.0000 \\
-    RWA\_Mercado\_lag4 & 1.2326*** & 0.3302 & 3.733 & 0.0002 \\
-    RWA\_Operacional\_lag4 & 0.8887 & 2.0699 & 0.429 & 0.6677 \\
-    Capital\_Principal\_lag4 & -0.0783 & 0.0570 & -1.375 & 0.1692 \\
-    Alavancagem\_lag4 & -0.5946*** & 0.0743 & -7.999 & 0.0000 \\
-    PIB\_lag4 & 0.0917 & 0.0596 & 1.537 & 0.1242 \\
-    Spread\_lag4 & 0.4041*** & 0.0620 & 6.523 & 0.0000 \\
-    Desemprego\_lag4 & -0.0738 & 0.0541 & -1.363 & 0.1728 \\
-    RWA\_Operacional\_lag4\_x\_Alavancagem\_lag4 & 2.6154*** & 0.4791 & 5.460 & 0.0000 \\
+    const & -22.4206*** & 1.3808 & -16.238 & 0.0000 \\
+    RWA\_Credito\_lag4 & -75.7965*** & 5.2248 & -14.507 & 0.0000 \\
+    RWA\_Mercado\_lag4 & 2.7830*** & 0.6956 & 4.001 & 0.0001 \\
+    RWA\_Operacional\_lag4 & -1.0610 & 2.3303 & -0.455 & 0.6489 \\
+    Capital\_Principal\_lag4 & -0.1772*** & 0.0618 & -2.868 & 0.0041 \\
+    Alavancagem\_lag4 & -0.6081*** & 0.0799 & -7.614 & 0.0000 \\
+    NPL\_Volatility\_8Q\_lag4 & 0.6095*** & 0.0648 & 9.399 & 0.0000 \\
+    PIB\_lag4 & 0.0488 & 0.0613 & 0.796 & 0.4263 \\
+    Spread\_lag4 & 0.3425*** & 0.0634 & 5.399 & 0.0000 \\
+    Desemprego\_lag4 & -0.1493*** & 0.0558 & -2.677 & 0.0074 \\
+    RWA\_Operacional\_lag4\_x\_Alavancagem\_lag4 & 3.2318*** & 0.6012 & 5.376 & 0.0000 \\
     \hline
     \multicolumn{5}{l}{\textit{Nota: *** p<0.01, ** p<0.05, * p<0.1. Limiar: P90 do Índice NPL.}} \\
-    \multicolumn{5}{l}{\textit{Pseudo $R^2$ (Treino): 0.3462. AUC-ROC (Teste OOT): 0.7477.}} \\
+    \multicolumn{5}{l}{\textit{Pseudo $R^2$ (Treino): 0.3821. AUC-ROC (Teste OOT): 0.7602.}} \\
     \hline
   \end{tabular}
 \end{table}
@@ -51,11 +52,11 @@
     \hline
     \textbf{Métrica} & \textbf{Treino (In-Sample)} & \textbf{Teste (Out-of-Time)} \\
     \hline
-    Área sob a Curva ROC (AUC) & 0.8457 & 0.7477 \\
-    Recall (Sensibilidade) & -- & 57.8\% \\
-    Precisão & -- & 13.8\% \\
-    F1-Score & -- & 0.223 \\
-    Acurácia Global & -- & 74.3\% \\
+    Área sob a Curva ROC (AUC) & 0.8739 & 0.7602 \\
+    Recall (Sensibilidade) & -- & 53.6\% \\
+    Precisão & -- & 13.7\% \\
+    F1-Score & -- & 0.218 \\
+    Acurácia Global & -- & 75.4\% \\
     \hline
   \end{tabular}
 \end{table}
@@ -75,39 +76,39 @@
 \midrule
 \multicolumn{4}{c}{\textbf{Top 15 Instituições Mais Robustas}} \\
 \midrule
-1 & ITAU - PRUDENCIAL & 577.687 & 0.000 \\
-2 & BRADESCO - PRUDENCIAL & 459.166 & 0.000 \\
-3 & BB - PRUDENCIAL & 450.822 & 0.000 \\
-4 & CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 325.837 & 0.000 \\
-5 & SANTANDER - PRUDENCIAL & 292.193 & 0.000 \\
-6 & BTG PACTUAL - PRUDENCIAL & 116.518 & 0.000 \\
-7 & SAFRA - PRUDENCIAL & 75.882 & 0.000 \\
-8 & BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL & 38.099 & 0.000 \\
-9 & VOTORANTIM - PRUDENCIAL & 36.807 & 0.000 \\
-10 & NU PAGAMENTOS - PRUDENCIAL & 25.460 & 0.230 \\
-11 & CITIBANK - PRUDENCIAL & 24.584 & 0.000 \\
-12 & BCO DAYCOVAL S.A - PRUDENCIAL & 21.142 & 0.000 \\
-13 & BANRISUL - PRUDENCIAL & 19.031 & 0.000 \\
-14 & ABC-BRASIL - PRUDENCIAL & 18.518 & 0.000 \\
-15 & XP - PRUDENCIAL & 15.619 & 0.000 \\
+1 & ITAU - PRUDENCIAL & 13.816 & 0.000 \\
+2 & BB - PRUDENCIAL & 13.816 & 0.000 \\
+3 & BRADESCO - PRUDENCIAL & 13.816 & 0.000 \\
+4 & CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 13.816 & 0.000 \\
+5 & BNDES - PRUDENCIAL & 13.816 & 0.000 \\
+6 & SANTANDER - PRUDENCIAL & 13.816 & 0.000 \\
+7 & SAFRA - PRUDENCIAL & 13.816 & 0.000 \\
+8 & BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL & 13.816 & 0.000 \\
+9 & VOTORANTIM - PRUDENCIAL & 13.816 & 0.000 \\
+10 & BTG PACTUAL - PRUDENCIAL & 13.816 & 0.000 \\
+11 & XP - PRUDENCIAL & 13.816 & 0.000 \\
+12 & CITIBANK - PRUDENCIAL & 13.816 & 0.000 \\
+13 & BANRISUL - PRUDENCIAL & 13.478 & 0.000 \\
+14 & ABC-BRASIL - PRUDENCIAL & 9.177 & 0.000 \\
+15 & BNP PARIBAS - PRUDENCIAL & 8.513 & 0.000 \\
 \midrule
 \multicolumn{4}{c}{\textbf{Top 15 Instituições Menos Robustas}} \\
 \midrule
-113 & GAZINCRED SCFI - PRUDENCIAL & -1.859 & 0.865 \\
-114 & AME DIGITAL BRASIL IP - PRUDENCIAL & -1.918 & 0.872 \\
-115 & QISTA S.A. CFI - PRUDENCIAL & -2.011 & 0.882 \\
-116 & PROVER PROMOCAO DE VENDAS IP - PRUDENCIAL & -2.030 & 0.884 \\
-117 & BANQI IP - PRUDENCIAL & -2.055 & 0.886 \\
-118 & STARK SCD - PRUDENCIAL & -2.088 & 0.890 \\
-119 & RECARGAPAY IP - PRUDENCIAL & -2.106 & 0.891 \\
-120 & DM FINANCEIRA CFI - PRUDENCIAL & -2.127 & 0.893 \\
-121 & COOPER CARD IP - PRUDENCIAL & -2.154 & 0.896 \\
-122 & SUMUP IP - PRUDENCIAL & -2.173 & 0.898 \\
-123 & BRINKS PAY IP - PRUDENCIAL & -2.176 & 0.898 \\
-124 & EFI S.A. IP - PRUDENCIAL & -2.179 & 0.898 \\
-125 & PINBANK BRASIL IP - PRUDENCIAL & -2.188 & 0.899 \\
-126 & ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL & -2.191 & 0.899 \\
-127 & CREFISA S.A. CFI - PRUDENCIAL & -5.693 & 0.996 \\
+144 & AME DIGITAL BRASIL IP - PRUDENCIAL & -2.128 & 0.894 \\
+145 & VR - PRUDENCIAL & -2.140 & 0.895 \\
+146 & PROVER PROMOCAO DE VENDAS IP - PRUDENCIAL & -2.232 & 0.903 \\
+147 & SUMUP IP - PRUDENCIAL & -2.232 & 0.903 \\
+148 & COOPER CARD IP - PRUDENCIAL & -2.255 & 0.905 \\
+149 & BANQI IP - PRUDENCIAL & -2.256 & 0.905 \\
+150 & RECARGAPAY IP - PRUDENCIAL & -2.275 & 0.907 \\
+151 & STARK SCD - PRUDENCIAL & -2.287 & 0.908 \\
+152 & QISTA S.A. CFI - PRUDENCIAL & -2.304 & 0.909 \\
+153 & ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL & -2.336 & 0.912 \\
+154 & BRINKS PAY IP - PRUDENCIAL & -2.358 & 0.914 \\
+155 & EFI S.A. IP - PRUDENCIAL & -2.367 & 0.914 \\
+156 & PINBANK BRASIL IP - PRUDENCIAL & -2.394 & 0.916 \\
+157 & CIELO IP - PRUDENCIAL & -2.481 & 0.923 \\
+158 & CREFISA S.A. CFI - PRUDENCIAL & -6.303 & 0.998 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -126,42 +127,42 @@
 \textbf{Variável} & \textbf{Coeficiente} \\
                   & \textbf{(Erro Padrão)} \\
 \midrule
-const & -4.8392*** \\
- & (0.9853) \\
+const & -21.1132 \\
+ & (45126.1542) \\
 \addlinespace
-RWA Credito & -0.1916 \\
- & (0.2026) \\
+RWA Credito & 0.3655 \\
+ & (0.2792) \\
 \addlinespace
-RWA Mercado & 0.0065 \\
- & (0.1392) \\
+RWA Mercado & 0.3814*** \\
+ & (0.1457) \\
 \addlinespace
-RWA Operacional & 0.0619 \\
- & (0.3152) \\
+RWA Operacional & -0.2823 \\
+ & (0.3237) \\
 \addlinespace
-Capital Principal & 0.2398 \\
- & (0.1855) \\
+Capital Principal & -0.9089** \\
+ & (0.3706) \\
 \addlinespace
-Alavancagem & 0.0571 \\
- & (0.2468) \\
+Alavancagem & 1.1938** \\
+ & (0.4861) \\
 \addlinespace
-PIB & 0.1305 \\
- & (0.2012) \\
+NPL Volatility 8Q & -0.0848 \\
+ & (0.1274) \\
 \addlinespace
-Spread & -0.1502 \\
- & (0.1149) \\
+PIB & -0.3300* \\
+ & (0.1970) \\
 \addlinespace
-Desemprego & -0.3961** \\
- & (0.2003) \\
+Spread & 0.5665*** \\
+ & (0.1260) \\
 \addlinespace
-NPL Volatility 8Q & -0.0166 \\
- & (0.1297) \\
+Desemprego & 0.1955 \\
+ & (0.1897) \\
 \addlinespace
-RWA Operacional x Alavancagem & -9.1011*** \\
- & (2.5671) \\
+RWA Operacional x Alavancagem & 1.5696 \\
+ & (1.1013) \\
 \addlinespace
 \midrule
 Observações & 730 \\
-Pseudo $R^2$ & 0.3469 \\
+Pseudo $R^2$ & 0.4128 \\
 Número de Inst. & 49 \\
 Efeitos Fixos & SIM \\
 \bottomrule
@@ -180,42 +181,42 @@ Efeitos Fixos & SIM \\
 % ==========================================================
 \begin{table}[htbp]
   \centering
-  \caption{Analise de Sensibilidade (Cenarios: Severo vs Crise Sistêmica [+5\% Desemprego])}
+  \caption{Analise de Sensibilidade (Cenarios: Severo vs Crise Sistemica [+5\% Desemprego])}
   \label{tab:stress_test}
   \begin{tabular}{lcccc}
     \hline
-    \textbf{Instituição} & \textbf{Baseline} & \textbf{Severo} & \textbf{Sistêmica} & \textbf{Impacto} \\
+    \textbf{Instituicao} & \textbf{Baseline} & \textbf{Severo} & \textbf{Sistemica} & \textbf{Impacto} \\
     \hline
-    \multicolumn{5}{l}{\textbf{Painel A: 15 Instituições Mais Vulneráveis (Menor Resiliência)}} \\
+    \multicolumn{5}{l}{\textbf{Painel A: 15 Instituicoes Mais Vulneraveis (Menor Resiliencia)}} \\
     \hline
-    AGENCIA FOMENTO EST RJ S.A. -  & 94.9% & 95.5% & 96.1% & -0.28 \\
-    BNY MELLON - PRUDENCIAL & 85.3% & 86.6% & 88.1% & -0.24 \\
-    UBS (BRASIL) - PRUDENCIAL & 90.4% & 91.2% & 92.2% & -0.22 \\
-    BCO CLASSICO S.A. - PRUDENCIAL & 46.7% & 49.0% & 52.3% & -0.22 \\
-    SCOTIABANK BRASIL - PRUDENCIAL & 75.6% & 77.2% & 79.4% & -0.22 \\
-    BCO SUMITOMO MITSUI BRASIL S.A & 63.4% & 65.4% & 68.1% & -0.21 \\
-    GOLDMAN SACHS - PRUDENCIAL & 75.4% & 76.9% & 79.1% & -0.21 \\
-    JP MORGAN CHASE - PRUDENCIAL & 75.4% & 76.8% & 78.9% & -0.20 \\
-    BOFA MERRILL LYNCH - PRUDENCIA & 61.8% & 63.7% & 66.4% & -0.20 \\
-    VOLVO - PRUDENCIAL & 0.9% & 1.0% & 1.1% & -0.20 \\
-    PAGSEGURO - PRUDENCIAL & 78.6% & 79.9% & 81.8% & -0.20 \\
-    TULLETT PREBON BRASIL S.A. CTV & 96.9% & 97.2% & 97.5% & -0.20 \\
-    MORGAN STANLEY - PRUDENCIAL & 63.0% & 64.9% & 67.5% & -0.20 \\
-    CAIXA GERAL - PRUDENCIAL & 89.1% & 89.8% & 90.9% & -0.20 \\
-    BD REGIONAL DO EXTREMO SUL - P & 0.2% & 0.2% & 0.2% & -0.20 \\
-    \hline
-    \multicolumn{5}{l}{\textbf{Painel B: 10 Instituições Mais Resilientes (Maior Estabilidade)}} \\
-    \hline
-    XP - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
-    VOTORANTIM - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    ABC-BRASIL - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BANCO C6 - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BB - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BANRISUL - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BCO DAYCOVAL S.A - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BCO DO NORDESTE DO BRASIL S.A. & 0.0% & 0.0% & 0.0% & 0.00 \\
+    CITIBANK - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
     BNDES - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BRADESCO - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    BTG PACTUAL - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    CAIXA ECONÔMICA FEDERAL - PRUD & 0.0% & 0.0% & 0.0% & 0.00 \\
     ITAU - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
     NU PAGAMENTOS - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
     SAFRA - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
     SANTANDER - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
-    BCO DAYCOVAL S.A - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
-    BCO DO NORDESTE DO BRASIL S.A. & 0.0% & 0.0% & 0.0% & 0.00 \\
-    BB - PRUDENCIAL & 0.0% & 0.0% & 0.0% & 0.00 \\
+    \hline
+    \multicolumn{5}{l}{\textbf{Painel B: 10 Instituicoes Mais Resilientes (Maior Estabilidade)}} \\
+    \hline
+    CIELO IP - PRUDENCIAL & 74.4% & 70.0% & 63.1% & 0.53 \\
+    SEM PARAR IP - PRUDENCIAL & 76.6% & 72.4% & 65.8% & 0.53 \\
+    MAGALUPAY IP - PRUDENCIAL & 93.6% & 92.2% & 89.6% & 0.53 \\
+    BMP SCMEPP LTDA - PRUDENCIAL & 94.6% & 93.3% & 91.1% & 0.53 \\
+    FFCRED SCD - PRUDENCIAL & 94.6% & 93.4% & 91.2% & 0.53 \\
+    QISTA S.A. CFI - PRUDENCIAL & 95.8% & 94.8% & 93.1% & 0.53 \\
+    COOPER CARD IP - PRUDENCIAL & 99.4% & 99.2% & 98.9% & 0.53 \\
+    SIMPALA CFI - PRUDENCIAL & 96.0% & 95.2% & 93.5% & 0.52 \\
+    PORTO SEGURO - PRUDENCIAL & 0.1% & 0.1% & 0.0% & 0.50 \\
+    ORIGINAL - PRUDENCIAL & 0.1% & 0.1% & 0.1% & 0.50 \\
     \hline
   \end{tabular}
 \end{table}

@@ -4,7 +4,7 @@ import numpy as np
 
 # 1. Carregar Dados
 painel_path = 'dados/brutos/painel_final.csv'
-df = pd.read_csv(painel_path, sep=';', decimal=',', encoding='latin1')
+df = pd.read_csv(painel_path)
 
 # 2. Processar NPL
 npl_col = [c for c in df.columns if 'NPL' in c][0]

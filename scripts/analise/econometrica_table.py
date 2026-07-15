@@ -1,16 +1,18 @@
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
-from pathlib import Path
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "utilitarios"))
+import config
 
 # Paths
-WORKSPACE_DIR = Path(".")
-DATA_PATH = WORKSPACE_DIR / "dados" / "brutos" / "painel_final.csv"
+DATA_PATH = config.RAW_PANEL
 
 def generate_econometrica_table():
     print("="*60)
-    print("GERANDO TABELA ECONOMETRICA (FE LOGIT) COM DESEMPREGO")
+    print("GERANDO TABELA ECONOMETRICA (FE LOGIT) - MESMA ESPECIFICACAO DO MODELO FINAL")
     print("="*60)
 
     if not DATA_PATH.exists():
@@ -20,33 +22,21 @@ def generate_econometrica_table():
     # 1. Carregar Dados
     df = pd.read_csv(DATA_PATH)
     df['Data'] = pd.to_datetime(df['Data'])
-    
+    df.sort_values(['Instituicao', 'Data'], inplace=True)
+
     # 2. Preenchimento de Faltantes (Macro)
-    # No painel_final, as colunas ja sao PIB, IPCA, Spread, Desemprego
     for col in ['Desemprego', 'PIB', 'Spread']:
         if col in df.columns:
             df[col] = df.groupby('Instituicao')[col].ffill().bfill()
-            
-    # Volatilidade do NPL (Proxy de Risco dinamico)
-    df['NPL_Volatility_8Q'] = df.groupby('Instituicao')['NPL'].transform(lambda x: x.rolling(8, 4).std())
-    df['NPL_Volatility_8Q'] = df['NPL_Volatility_8Q'].fillna(df['NPL_Volatility_8Q'].mean())
-    
-    # 3. Lags
-    LAG = 4
-    core_features = ['RWA_Credito', 'RWA_Mercado', 'RWA_Operacional', 'Capital_Principal', 'Alavancagem', 'PIB', 'Spread', 'Desemprego', 'NPL_Volatility_8Q']
-    df_model = df.copy()
-    features = []
-    for f in core_features:
-        name = f'{f}_lag{LAG}'
-        df_model[name] = df_model.groupby('Instituicao')[f].shift(LAG)
-        features.append(name)
-    
-    # Termo de Interação
-    df_model['RWA_Operacional_lag4_x_Alavancagem_lag4'] = df_model['RWA_Operacional_lag4'] * df_model['Alavancagem_lag4']
-    features_ext = features + ['RWA_Operacional_lag4_x_Alavancagem_lag4']
-    
-    # Target
-    threshold_p90 = df_model['NPL'].quantile(0.90)
+
+    # Volatilidade do NPL (proxy de risco dinamico) via config
+    df = config.add_npl_volatility(df)
+
+    # 3. Lags e interacao (mesma especificacao do modelo final)
+    df_model, features_ext = config.build_lagged_features(df.copy())
+
+    # Target P90
+    threshold_p90 = df_model['NPL'].quantile(config.P90_QUANTILE)
     df_model['Target'] = (df_model['NPL'] > threshold_p90).astype(int)
     
     # 4. Preparar para Efeitos Fixos (Instituições com variação no Target)
@@ -82,7 +72,7 @@ def generate_econometrica_table():
         std_err = res.bse[f]
         p_val = res.pvalues[f]
         stars = "***" if p_val < 0.01 else "**" if p_val < 0.05 else "*" if p_val < 0.1 else ""
-        display_name = f.replace('_lag4', '').replace('_', ' ')
+        display_name = f.replace(f'_lag{config.LAG}', '').replace('_', ' ')
         summary_data.append([display_name, f"{coef:.4f}{stars}", f"({std_err:.4f})"])
 
     # 5. Gerar LaTeX
@@ -109,7 +99,7 @@ def generate_econometrica_table():
     latex_out += "\\multicolumn{2}{l}{\\small Notas: *** p<0.01, ** p<0.05, * p<0.1.} \\\\\n"
     latex_out += "\\end{tabular}\n\\end{table}\n"
 
-    output_path = WORKSPACE_DIR / "resultados" / "relatorios" / "tabela_fe_econometrica.tex"
+    output_path = config.REPORTS_DIR / "tabela_fe_econometrica.tex"
     with open(output_path, "w", encoding="utf-8") as f: f.write(latex_out)
     print(f"✅ Tabela Econométrica gerada: {output_path}")
 

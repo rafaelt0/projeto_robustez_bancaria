@@ -75,8 +75,13 @@ python scripts/analise/stress_testing.py
 
 ## 📊 Especificação do Modelo Final (Logit P90)
 
+> A especificação é definida em um único ponto — `scripts/utilitarios/config.py` —
+> e é consumida por todos os scripts (modelagem, stress testing e tabelas). Não há
+> parâmetros duplicados ou embutidos manualmente.
+
 **Target:**  
-Estresse Bancário (NPL > 12.41%)
+Estresse Bancário (NPL acima do percentil 90). O limiar é estimado **apenas no
+período de treino** (≈ 16.76% na base atual), evitando vazamento do futuro.
 
 **Horizonte de Previsão:**  
 12 meses (Lag de 4 trimestres)
@@ -95,7 +100,12 @@ Estresse Bancário (NPL > 12.41%)
 
 **Macroeconômicas**
 - Crescimento do PIB
-- Taxa Selic
+- Spread bancário
+- Desemprego
+
+> ℹ️ A série **Selic** está ausente na base de dados (coluna vazia na fonte) e,
+> portanto, não é utilizada. O Spread bancário é a variável financeira macro
+> efetivamente disponível.
 
 **Interações**
 - RWA Operacional × Alavancagem  
@@ -105,8 +115,13 @@ Estresse Bancário (NPL > 12.41%)
 
 ## 📈 Performance
 
+Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
+decisão 0.60. Valores regenerados automaticamente em
+`resultados/relatorios/modelo_final_performance.csv`.
+
 | Métrica | Valor |
 |---------|-------|
-| AUC-ROC | 0.8655 |
-| Pseudo R² | 0.2621 |
-| Recall (@0.175) | 61.1% |
+| AUC-ROC (Treino) | 0.8739 |
+| AUC-ROC (Teste OOT) | 0.7602 |
+| Pseudo R² (McFadden) | 0.3821 |
+| Recall (Teste @0.60) | 53.6% |
