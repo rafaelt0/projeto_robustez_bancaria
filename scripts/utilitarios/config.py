@@ -21,9 +21,9 @@ P90_QUANTILE = 0.90
 
 # Limiar de decisao aplicado sobre a PROBABILIDADE CALIBRADA (ver calibracao
 # abaixo). Ajustado ao ponto de maximo F1 out-of-time. Com as probabilidades
-# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 12%"
-# (~2x a taxa-base do evento).
-DECISION_THRESHOLD = 0.12
+# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 25%"
+# (~4x a taxa-base do evento).
+DECISION_THRESHOLD = 0.25
 
 # Validacao out-of-time: treino antes desta data, teste a partir dela.
 SPLIT_DATE = "2022-01-01"
@@ -57,6 +57,7 @@ CORE_FEATURES = [
     "log_RWA_Total",
     "Capital_Principal",
     "Alavancagem",
+    "NPL",                # nivel do NPL defasado (persistencia da inadimplencia)
     "NPL_Volatility_8Q",
     "PIB",
     "Spread",

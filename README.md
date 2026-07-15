@@ -103,6 +103,7 @@ período de treino** (≈ 16.76% na base atual), evitando vazamento do futuro.
 - Alavancagem
 
 **Dinâmica Temporal**
+- NPL defasado (persistência da inadimplência — preditor mais forte)
 - Volatilidade do NPL (janela móvel de 8 trimestres)
 
 **Macroeconômicas**
@@ -134,19 +135,25 @@ a taxa-base real do evento.
 ## 📈 Performance
 
 Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
-decisão calibrado 0.12. Valores regenerados automaticamente em
+decisão calibrado 0.25. Valores regenerados automaticamente em
 `resultados/relatorios/modelo_final_performance.csv`.
 
 | Métrica | Valor |
 |---------|-------|
-| AUC-ROC (Treino) | 0.8198 |
-| AUC-ROC (Teste OOT) | 0.7431 |
-| AUC-PR (Teste OOT) | 0.1823 *(baseline 0.059)* |
-| Pseudo R² (McFadden) | 0.1217 |
-| Brier (Teste OOT) | 0.0691 |
-| Recall (Teste @0.12) | 45.5% |
+| AUC-ROC (Treino) | 0.9266 |
+| AUC-ROC (Teste OOT) | 0.8076 |
+| AUC-PR (Teste OOT) | 0.2349 *(baseline 0.059)* |
+| Pseudo R² (McFadden) | 0.2493 |
+| Brier (Teste OOT) | 0.0649 |
+| Recall (Teste @0.25) | 41.6% |
 
-> ✅ **Calibração:** probabilidade média prevista ≈ 0.106 vs. taxa real ≈ 0.059
-> (Brier 0.220 → 0.069 após Platt). As probabilidades — inclusive as do stress
-> test — podem ser lidas como probabilidades reais de estresse, não apenas como
-> score relativo.
+> ✅ **Calibração:** probabilidade média prevista ≈ 0.094 vs. taxa real ≈ 0.059
+> (Brier ≈ 0.065 após Platt). As probabilidades — inclusive as do stress test —
+> podem ser lidas como probabilidades reais de estresse, não apenas como score
+> relativo.
+
+> 📈 **Enriquecimento de dados:** a inclusão do **NPL defasado** (persistência da
+> inadimplência) elevou a AUC-ROC de 0.74 → 0.81 e a AUC-PR de 0.18 → 0.23. A
+> coleta de séries adicionais do BCB (ex.: Selic) depende de acesso à API do
+> Banco Central, indisponível no ambiente atual — deve ser executada via
+> `scripts/preparacao_dados/` em rede liberada.
