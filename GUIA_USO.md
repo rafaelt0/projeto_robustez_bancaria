@@ -21,8 +21,19 @@ Para reproduzir a análise completa do zero, siga esta ordem:
 
 ### Etapa 1: Coleta e Consolidação de Dados
 1. `scripts/preparacao_dados/script_scraping_var_dependentes.py`: Baixa os dados do IF.data (BCB).
-2. `scripts/preparacao_dados/coletar_macros_bcb.py`: Coleta indicadores macroeconômicos (PIB, SELIC, etc.).
+2. `scripts/preparacao_dados/coletar_macros_bcb.py`: Coleta indicadores macroeconômicos (PIB, IPCA, Spread, **Selic**, Desemprego) via API SGS do BCB.
 3. `scripts/preparacao_dados/consolidar_painel_datas.py`: Consolida os arquivos baixados em um único painel de dados (`dados/consolidados/painel_completo.csv`).
+
+> ⚠️ A Etapa 1 requer **acesso de rede a `api.bcb.gov.br`**. Em ambientes com
+> egresso restrito ela falha (HTTP 403) — rode-a em um ambiente com rede liberada.
+
+#### Ativando a Selic no modelo
+A série **Selic** está disponível no coletor mas ainda vazia no painel versionado.
+Para incluí-la:
+1. Rode `coletar_macros_bcb.py` (num ambiente com rede) → gera `indicadores_macro_sgs.csv` com a Selic.
+2. Rode `scripts/preparacao_dados/integrar_painel_final.py` → mescla a Selic em `painel_final.csv`.
+3. Adicione `"Selic"` a `CORE_FEATURES` em `scripts/utilitarios/config.py`.
+4. Rode `python run_project.py`.
 
 ### Etapa 2: Modelagem
 4. `scripts/modelos/modelo_final_recomendado.py`: Executa o modelo Logit (lag 4 = 12 meses) com as variáveis definidas em `scripts/utilitarios/config.py` e interação RWA/Alavancagem. Grava coeficientes, parâmetros de escala, métricas de performance e o ranking de robustez.

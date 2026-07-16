@@ -53,9 +53,11 @@ CALIBRATION_FOLD_FRAC = 0.20
 #   - Dinamica temporal: Volatilidade do NPL (janela de 8 trimestres).
 #   - Macroeconomicas:   PIB, Spread, Desemprego.
 #
-# Nota: a serie Selic esta ausente no painel (coluna 100% vazia na fonte de
-# dados), portanto NAO e utilizada. O Spread bancario e a variavel financeira
-# macro efetivamente disponivel.
+# Nota: a serie Selic esta vazia no painel atual. O coletor
+# scripts/preparacao_dados/coletar_macros_bcb.py ja esta preparado para baixa-la
+# (SGS 4189); apos rodar o coletor + integrar_painel_final.py num ambiente com
+# acesso a api.bcb.gov.br, basta adicionar "Selic" a esta lista para inclui-la.
+# Enquanto a coluna estiver vazia, NAO adicione (o modelo perde todas as linhas).
 CORE_FEATURES = [
     "RWA_Credito_share",
     "RWA_Mercado_share",
