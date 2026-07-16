@@ -38,10 +38,11 @@ Para incluí-la:
 ### Etapa 2: Modelagem
 4. `scripts/modelos/modelo_final_recomendado.py`: Executa o modelo Logit (lag 4 = 12 meses) com as variáveis definidas em `scripts/utilitarios/config.py` e interação RWA/Alavancagem. Grava coeficientes, parâmetros de escala, métricas de performance e o ranking de robustez.
 
-### Etapa 3: Análise e Relatórios
-5. `scripts/analise/econometrica_table.py`: Estima a variante com Efeitos Fixos (mesma especificação) e gera a tabela econométrica.
-6. `scripts/analise/stress_testing.py`: Realiza testes de estresse **lendo os coeficientes e a escala gravados na Etapa 2** (não há parâmetros embutidos).
-7. `scripts/analise/gerar_tabelas_latex.py`: Consolida todas as tabelas em `tabelas_final_latex.txt`.
+### Etapa 3: Validação, Análise e Relatórios
+5. `scripts/analise/walk_forward_validation.py`: Validação walk-forward (janela expansiva) — estimativa de performance mais honesta e seleção do limiar por CV. Gera `resultados/relatorios/walk_forward_folds.csv`.
+6. `scripts/analise/econometrica_table.py`: Estima a variante com Efeitos Fixos (mesma especificação) e gera a tabela econométrica.
+7. `scripts/analise/stress_testing.py`: Realiza testes de estresse **lendo os coeficientes e a escala gravados na Etapa 2** (não há parâmetros embutidos).
+8. `scripts/analise/gerar_tabelas_latex.py`: Consolida todas as tabelas em `tabelas_final_latex.txt`.
 
 > 💡 Todas as etapas 2–3 podem ser executadas de uma vez com `python run_project.py`.
 > A ordem importa: o stress test e as tabelas dependem dos CSVs gerados pela Etapa 2.

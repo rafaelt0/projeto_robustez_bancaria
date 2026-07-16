@@ -20,10 +20,11 @@ LAG = 4
 P90_QUANTILE = 0.90
 
 # Limiar de decisao aplicado sobre a PROBABILIDADE CALIBRADA (ver calibracao
-# abaixo). Ajustado ao ponto de maximo F1 out-of-time. Com as probabilidades
-# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 14%"
-# (~2.4x a taxa-base do evento).
-DECISION_THRESHOLD = 0.14
+# abaixo). Escolhido por VALIDACAO WALK-FORWARD (maximo F1 sobre as previsoes
+# out-of-fold), e nao ajustado no proprio conjunto de teste. Com as probabilidades
+# calibradas, e interpretavel: "sinalizar estresse se P(estresse) > 17%".
+# Ver scripts/analise/walk_forward_validation.py.
+DECISION_THRESHOLD = 0.17
 
 # Validacao out-of-time: treino antes desta data, teste a partir dela.
 SPLIT_DATE = "2022-01-01"

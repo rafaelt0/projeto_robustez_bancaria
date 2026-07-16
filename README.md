@@ -136,18 +136,31 @@ do tempo (*drift*).
 
 ## 📈 Performance
 
-Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
-decisão calibrado 0.14. Valores regenerados automaticamente em
-`resultados/relatorios/modelo_final_performance.csv`.
+O modelo é avaliado de duas formas complementares:
+
+**1. Validação walk-forward (janela expansiva) — estimativa honesta.**
+Reestima o modelo a cada trimestre (treina no passado, prevê o trimestre
+seguinte) e agrega as previsões *out-of-fold* dos 23 folds. O limiar de decisão
+(0.17) é escolhido por CV sobre essas previsões, **sem espiar o teste**.
+Gerado por `scripts/analise/walk_forward_validation.py`.
+
+| Métrica (OOF, 23 folds) | Valor |
+|---------|-------|
+| AUC-ROC | 0.8730 |
+| AUC-PR | 0.3985 *(baseline 0.068)* |
+| Brier | 0.0510 |
+| Precisão / Recall (@0.17) | 42.5% / 57.9% |
+
+**2. Corte único *out-of-time* (treino ≤2021, teste ≥2022) — *worst-case*.**
+Mede um único cenário de quebra de regime (a mudança do NPL bancário pós-2022).
+Regenerado em `resultados/relatorios/modelo_final_performance.csv`.
 
 | Métrica | Valor |
 |---------|-------|
-| AUC-ROC (Treino) | 0.9266 |
-| AUC-ROC (Teste OOT) | 0.8076 |
-| AUC-PR (Teste OOT) | 0.2349 *(baseline 0.059)* |
+| AUC-ROC (Treino / Teste) | 0.9266 / 0.8076 |
+| AUC-PR (Teste) | 0.2349 *(baseline 0.059)* |
 | Pseudo R² (McFadden) | 0.2493 |
-| Brier (Teste OOT) | 0.0539 |
-| Precisão / Recall (Teste @0.14) | 30.0% / 35.1% |
+| Brier (Teste) | 0.0539 |
 
 > ✅ **Calibração:** com o ajuste no fold recente, o quintil de maior risco fica
 > bem calibrado (previsto ≈ 0.175 vs. real ≈ 0.172) e o erro de calibração (ECE)

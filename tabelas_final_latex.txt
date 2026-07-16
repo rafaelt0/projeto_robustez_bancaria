@@ -48,17 +48,17 @@
 
 \begin{table}[htbp]
   \centering
-  \caption{Desempenho Preditivo do Modelo (Limiar calibrado = 0.14)}
+  \caption{Desempenho Preditivo do Modelo (Limiar calibrado = 0.17)}
   \label{tab:performance}
   \begin{tabular}{lcc}
     \hline
     \textbf{Métrica} & \textbf{Treino (In-Sample)} & \textbf{Teste (Out-of-Time)} \\
     \hline
     Área sob a Curva ROC (AUC) & 0.9266 & 0.8076 \\
-    Recall (Sensibilidade) & -- & 35.1\% \\
-    Precisão & -- & 30.0\% \\
-    F1-Score & -- & 0.323 \\
-    Acurácia Global & -- & 91.3\% \\
+    Recall (Sensibilidade) & -- & 29.9\% \\
+    Precisão & -- & 31.9\% \\
+    F1-Score & -- & 0.309 \\
+    Acurácia Global & -- & 92.1\% \\
     \hline
   \end{tabular}
 \end{table}
