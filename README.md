@@ -126,16 +126,18 @@ erros-padrão analíticos, a inferência (erro-padrão, z, p-valor) é obtida po
 
 **Calibração:** o balanceamento por pesos desloca as probabilidades brutas para
 cima, então aplica-se **calibração de Platt** (logística de 2 parâmetros sobre o
-log-odds, ajustada no treino). Por ser monotônica, preserva a ordenação (AUC) e
-recupera probabilidades interpretáveis — a probabilidade prevista passa a refletir
-a taxa-base real do evento.
+log-odds). Por ser monotônica, preserva a ordenação (AUC) e recupera
+probabilidades interpretáveis. A calibração é ajustada num **fold recente do
+treino** (último ~ano) — temporalmente próximo do teste —, o que corrige a
+superestimação da cauda de alto risco causada pela mudança da taxa-base ao longo
+do tempo (*drift*).
 
 ---
 
 ## 📈 Performance
 
 Validação *out-of-time* (treino até 2021, teste a partir de 2022), limiar de
-decisão calibrado 0.25. Valores regenerados automaticamente em
+decisão calibrado 0.14. Valores regenerados automaticamente em
 `resultados/relatorios/modelo_final_performance.csv`.
 
 | Métrica | Valor |
@@ -144,13 +146,13 @@ decisão calibrado 0.25. Valores regenerados automaticamente em
 | AUC-ROC (Teste OOT) | 0.8076 |
 | AUC-PR (Teste OOT) | 0.2349 *(baseline 0.059)* |
 | Pseudo R² (McFadden) | 0.2493 |
-| Brier (Teste OOT) | 0.0649 |
-| Recall (Teste @0.25) | 41.6% |
+| Brier (Teste OOT) | 0.0539 |
+| Precisão / Recall (Teste @0.14) | 30.0% / 35.1% |
 
-> ✅ **Calibração:** probabilidade média prevista ≈ 0.094 vs. taxa real ≈ 0.059
-> (Brier ≈ 0.065 após Platt). As probabilidades — inclusive as do stress test —
-> podem ser lidas como probabilidades reais de estresse, não apenas como score
-> relativo.
+> ✅ **Calibração:** com o ajuste no fold recente, o quintil de maior risco fica
+> bem calibrado (previsto ≈ 0.175 vs. real ≈ 0.172) e o erro de calibração (ECE)
+> cai de ≈ 0.051 para ≈ 0.029 (Brier 0.065 → 0.054). As probabilidades — inclusive
+> as do stress test — podem ser lidas como probabilidades reais de estresse.
 
 > 📈 **Enriquecimento de dados:** a inclusão do **NPL defasado** (persistência da
 > inadimplência) elevou a AUC-ROC de 0.74 → 0.81 e a AUC-PR de 0.18 → 0.23. A

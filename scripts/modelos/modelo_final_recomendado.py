@@ -150,9 +150,22 @@ def run_final_model():
     #    Ajusta-se uma logistica (2 parametros) do rotulo real sobre o log-odds
     #    bruto, SEM pesos, recuperando a prevalencia verdadeira do evento. Por ser
     #    monotonica no log-odds, preserva a ordenacao (AUC) do modelo.
+    #    A calibracao usa um FOLD RECENTE do treino (mais proximo do teste), o que
+    #    corrige a superestimacao da cauda causada pela mudanca da taxa-base (drift).
     lp_train = X_train_const.values @ params.values
     lp_test = X_test_const.values @ params.values
-    platt = LogisticRegression(C=1e6).fit(lp_train.reshape(-1, 1), y_train)
+
+    cal_cut = train["Data"].quantile(1 - config.CALIBRATION_FOLD_FRAC)
+    cal_mask = (train["Data"] > cal_cut).values
+    if cal_mask.sum() < 30 or y_train.values[cal_mask].sum() < 3:
+        cal_mask = np.ones(len(y_train), dtype=bool)  # fallback: treino inteiro
+    print(
+        f"Calibracao no fold recente: desde {train.loc[cal_mask, 'Data'].min().date()} "
+        f"({cal_mask.sum()} obs, taxa-base {y_train.values[cal_mask].mean():.3f})"
+    )
+    platt = LogisticRegression(C=1e6).fit(
+        lp_train[cal_mask].reshape(-1, 1), y_train.values[cal_mask]
+    )
     cal_a, cal_b = float(platt.coef_[0, 0]), float(platt.intercept_[0])
 
     probs_train_raw = 1 / (1 + np.exp(-np.clip(lp_train, -30, 30)))

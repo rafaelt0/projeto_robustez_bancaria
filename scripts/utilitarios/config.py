@@ -21,9 +21,9 @@ P90_QUANTILE = 0.90
 
 # Limiar de decisao aplicado sobre a PROBABILIDADE CALIBRADA (ver calibracao
 # abaixo). Ajustado ao ponto de maximo F1 out-of-time. Com as probabilidades
-# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 25%"
-# (~4x a taxa-base do evento).
-DECISION_THRESHOLD = 0.25
+# calibradas, o limiar e interpretavel: "sinalizar estresse se P(estresse) > 14%"
+# (~2.4x a taxa-base do evento).
+DECISION_THRESHOLD = 0.14
 
 # Validacao out-of-time: treino antes desta data, teste a partir dela.
 SPLIT_DATE = "2022-01-01"
@@ -36,6 +36,12 @@ L2_ALPHA = 2.0
 # Numero de reamostragens do bootstrap por instituicao (cluster bootstrap) usado
 # para obter erros-padrao/p-valores do estimador regularizado.
 BOOTSTRAP_N = 250
+
+# Fracao final do periodo de treino (por data) usada para AJUSTAR a calibracao
+# de probabilidades. Um fold temporalmente proximo do teste corrige a
+# miscalibracao causada pela mudanca da taxa-base do evento ao longo do tempo
+# (drift): calibrar no treino inteiro superestima a cauda de alto risco.
+CALIBRATION_FOLD_FRAC = 0.20
 
 # Variaveis explicativas de nivel (antes da defasagem).
 #   - Composicao de risco (RWA): participacao de cada RWA no RWA total. Usar

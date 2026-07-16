@@ -48,17 +48,17 @@
 
 \begin{table}[htbp]
   \centering
-  \caption{Desempenho Preditivo do Modelo (Limiar calibrado = 0.25)}
+  \caption{Desempenho Preditivo do Modelo (Limiar calibrado = 0.14)}
   \label{tab:performance}
   \begin{tabular}{lcc}
     \hline
     \textbf{Métrica} & \textbf{Treino (In-Sample)} & \textbf{Teste (Out-of-Time)} \\
     \hline
     Área sob a Curva ROC (AUC) & 0.9266 & 0.8076 \\
-    Recall (Sensibilidade) & -- & 41.6\% \\
-    Precisão & -- & 24.2\% \\
-    F1-Score & -- & 0.306 \\
-    Acurácia Global & -- & 88.9\% \\
+    Recall (Sensibilidade) & -- & 35.1\% \\
+    Precisão & -- & 30.0\% \\
+    F1-Score & -- & 0.323 \\
+    Acurácia Global & -- & 91.3\% \\
     \hline
   \end{tabular}
 \end{table}
@@ -78,39 +78,39 @@
 \midrule
 \multicolumn{4}{c}{\textbf{Top 15 Instituições Mais Robustas}} \\
 \midrule
-1 & ITAU - PRUDENCIAL & 4.671 & 0.009 \\
-2 & CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 4.565 & 0.010 \\
-3 & SAFRA - PRUDENCIAL & 4.539 & 0.011 \\
-4 & BB - PRUDENCIAL & 4.525 & 0.011 \\
-5 & BCO COOPERATIVO SICREDI - PRUDENCIAL & 4.443 & 0.012 \\
-6 & SANTANDER - PRUDENCIAL & 4.421 & 0.012 \\
-7 & BNDES - PRUDENCIAL & 4.406 & 0.012 \\
-8 & ABC-BRASIL - PRUDENCIAL & 4.382 & 0.012 \\
-9 & BCO SUMITOMO MITSUI BRASIL S.A. - PRUDENCIAL & 4.380 & 0.012 \\
-10 & ALFA - PRUDENCIAL & 4.374 & 0.012 \\
-11 & BRADESCO - PRUDENCIAL & 4.337 & 0.013 \\
-12 & BD REGIONAL DO EXTREMO SUL - PRUDENCIAL & 4.304 & 0.013 \\
-13 & BCO TOYOTA DO BRASIL S.A. - PRUDENCIAL & 4.280 & 0.014 \\
-14 & BOCOM - PRUDENCIAL & 4.249 & 0.014 \\
-15 & CREDIT AGRICOLE - PRUDENCIAL & 4.224 & 0.014 \\
+1 & ITAU - PRUDENCIAL & 5.297 & 0.005 \\
+2 & CAIXA ECONÔMICA FEDERAL - PRUDENCIAL & 5.210 & 0.005 \\
+3 & SAFRA - PRUDENCIAL & 5.199 & 0.005 \\
+4 & BB - PRUDENCIAL & 5.180 & 0.006 \\
+5 & BCO COOPERATIVO SICREDI - PRUDENCIAL & 5.110 & 0.006 \\
+6 & SANTANDER - PRUDENCIAL & 5.099 & 0.006 \\
+7 & BNDES - PRUDENCIAL & 5.086 & 0.006 \\
+8 & ABC-BRASIL - PRUDENCIAL & 5.067 & 0.006 \\
+9 & BCO SUMITOMO MITSUI BRASIL S.A. - PRUDENCIAL & 5.065 & 0.006 \\
+10 & ALFA - PRUDENCIAL & 5.064 & 0.006 \\
+11 & BRADESCO - PRUDENCIAL & 5.034 & 0.006 \\
+12 & BD REGIONAL DO EXTREMO SUL - PRUDENCIAL & 5.002 & 0.007 \\
+13 & BCO TOYOTA DO BRASIL S.A. - PRUDENCIAL & 4.981 & 0.007 \\
+14 & BOCOM - PRUDENCIAL & 4.959 & 0.007 \\
+15 & CREDIT AGRICOLE - PRUDENCIAL & 4.942 & 0.007 \\
 \midrule
 \multicolumn{4}{c}{\textbf{Top 15 Instituições Menos Robustas}} \\
 \midrule
-143 & BANCO C6 & 0.265 & 0.434 \\
-144 & EFI S.A. IP - PRUDENCIAL & 0.258 & 0.436 \\
-145 & SUMUP IP - PRUDENCIAL & 0.245 & 0.439 \\
-146 & HS FINANCEIRA - PRUDENCIAL & 0.203 & 0.449 \\
-147 & COBUCCIO SCFI - PRUDENCIAL & 0.110 & 0.473 \\
-148 & SANTINVEST - PRUDENCIAL & -0.068 & 0.517 \\
-149 & GOLCRED - PRUDENCIAL & -0.124 & 0.531 \\
-150 & BCO INBURSA INV S.A. - PRUDENCIAL & -0.276 & 0.568 \\
-151 & BCO KDB BRASIL S.A. - PRUDENCIAL & -0.453 & 0.611 \\
-152 & BANIF - PRUDENCIAL & -0.567 & 0.638 \\
-153 & ZEMA CFI - PRUDENCIAL & -0.729 & 0.675 \\
-154 & RECARGAPAY IP - PRUDENCIAL & -0.792 & 0.688 \\
-155 & VR - PRUDENCIAL & -1.073 & 0.745 \\
-156 & CREFISA S.A. CFI - PRUDENCIAL & -1.887 & 0.868 \\
-157 & ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL & -2.479 & 0.923 \\
+143 & COBUCCIO SCFI - PRUDENCIAL & 1.633 & 0.163 \\
+144 & HS FINANCEIRA - PRUDENCIAL & 1.628 & 0.164 \\
+145 & BANCO C6 & 1.582 & 0.170 \\
+146 & SANTINVEST - PRUDENCIAL & 1.463 & 0.188 \\
+147 & SUMUP IP - PRUDENCIAL & 1.449 & 0.190 \\
+148 & GOLCRED - PRUDENCIAL & 1.421 & 0.195 \\
+149 & BCO INBURSA INV S.A. - PRUDENCIAL & 1.321 & 0.211 \\
+150 & RECARGAPAY IP - PRUDENCIAL & 0.847 & 0.300 \\
+151 & ZEMA CFI - PRUDENCIAL & 0.760 & 0.319 \\
+152 & PLANNER - PRUDENCIAL & 0.737 & 0.324 \\
+153 & BANIF - PRUDENCIAL & 0.546 & 0.367 \\
+154 & BCO KDB BRASIL S.A. - PRUDENCIAL & 0.126 & 0.469 \\
+155 & VR - PRUDENCIAL & -0.133 & 0.533 \\
+156 & CREFISA S.A. CFI - PRUDENCIAL & -0.165 & 0.541 \\
+157 & ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL & -0.618 & 0.650 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -197,34 +197,34 @@ Efeitos Fixos & SIM \\
     \hline
     \multicolumn{5}{l}{\textbf{Painel A: 15 Instituicoes Mais Vulneraveis (Menor Resiliencia)}} \\
     \hline
-    SEM PARAR IP - PRUDENCIAL & 93.7% & 93.2% & 92.3% & 0.22 \\
-    COOPER CARD IP - PRUDENCIAL & 10.1% & 9.3% & 8.2% & 0.22 \\
-    CIELO IP - PRUDENCIAL & 5.9% & 5.4% & 4.7% & 0.22 \\
-    BMP SCMEPP LTDA - PRUDENCIAL & 5.7% & 5.2% & 4.6% & 0.22 \\
-    QISTA S.A. CFI - PRUDENCIAL & 4.1% & 3.7% & 3.3% & 0.22 \\
-    FFCRED SCD - PRUDENCIAL & 3.6% & 3.3% & 2.9% & 0.22 \\
-    MAGALUPAY IP - PRUDENCIAL & 3.5% & 3.2% & 2.8% & 0.22 \\
-    SIMPALA CFI - PRUDENCIAL & 8.8% & 8.1% & 7.2% & 0.23 \\
-    PORTO SEGURO - PRUDENCIAL & 3.3% & 3.0% & 2.7% & 0.23 \\
-    ORIGINAL - PRUDENCIAL & 4.3% & 3.9% & 3.4% & 0.23 \\
-    BANCO C6 - PRUDENCIAL & 1.8% & 1.6% & 1.4% & 0.23 \\
-    BCO FIBRA S.A. - PRUDENCIAL & 2.2% & 2.0% & 1.8% & 0.23 \\
-    PINE - PRUDENCIAL & 2.7% & 2.5% & 2.2% & 0.23 \\
-    BMG - PRUDENCIAL & 2.4% & 2.2% & 1.9% & 0.23 \\
-    XP - PRUDENCIAL & 2.4% & 2.2% & 1.9% & 0.23 \\
+    SEM PARAR IP - PRUDENCIAL & 65.1% & 63.4% & 60.9% & 0.18 \\
+    COOPER CARD IP - PRUDENCIAL & 3.6% & 3.3% & 3.0% & 0.18 \\
+    CIELO IP - PRUDENCIAL & 2.2% & 2.1% & 1.9% & 0.18 \\
+    BMP SCMEPP LTDA - PRUDENCIAL & 2.2% & 2.0% & 1.8% & 0.18 \\
+    QISTA S.A. CFI - PRUDENCIAL & 1.7% & 1.5% & 1.4% & 0.18 \\
+    FFCRED SCD - PRUDENCIAL & 1.5% & 1.4% & 1.3% & 0.18 \\
+    MAGALUPAY IP - PRUDENCIAL & 1.5% & 1.4% & 1.2% & 0.18 \\
+    SIMPALA CFI - PRUDENCIAL & 3.2% & 2.9% & 2.7% & 0.18 \\
+    PORTO SEGURO - PRUDENCIAL & 1.4% & 1.3% & 1.2% & 0.18 \\
+    ORIGINAL - PRUDENCIAL & 1.7% & 1.6% & 1.4% & 0.18 \\
+    BANCO C6 - PRUDENCIAL & 0.9% & 0.8% & 0.7% & 0.18 \\
+    BCO FIBRA S.A. - PRUDENCIAL & 1.0% & 0.9% & 0.8% & 0.18 \\
+    PINE - PRUDENCIAL & 1.2% & 1.1% & 1.0% & 0.18 \\
+    BMG - PRUDENCIAL & 1.1% & 1.0% & 0.9% & 0.18 \\
+    XP - PRUDENCIAL & 1.1% & 1.0% & 0.9% & 0.18 \\
     \hline
     \multicolumn{5}{l}{\textbf{Painel B: 10 Instituicoes Mais Resilientes (Maior Estabilidade)}} \\
     \hline
-    AGENCIA FOMENTO EST RJ S.A. -  & 7.8% & 7.0% & 6.1% & 0.27 \\
-    BNY MELLON - PRUDENCIAL & 60.9% & 58.3% & 54.8% & 0.25 \\
-    UBS (BRASIL) - PRUDENCIAL & 12.1% & 11.1% & 9.8% & 0.25 \\
-    BCO CLASSICO S.A. - PRUDENCIAL & 3.2% & 2.9% & 2.5% & 0.25 \\
-    SCOTIABANK BRASIL - PRUDENCIAL & 7.3% & 6.6% & 5.8% & 0.24 \\
-    BCO SUMITOMO MITSUI BRASIL S.A & 24.1% & 22.3% & 20.0% & 0.24 \\
-    GOLDMAN SACHS - PRUDENCIAL & 23.2% & 21.5% & 19.2% & 0.24 \\
-    JP MORGAN CHASE - PRUDENCIAL & 6.6% & 6.0% & 5.3% & 0.24 \\
-    BOFA MERRILL LYNCH - PRUDENCIA & 4.0% & 3.7% & 3.2% & 0.24 \\
-    VOLVO - PRUDENCIAL & 2.1% & 1.9% & 1.7% & 0.24 \\
+    AGENCIA FOMENTO EST RJ S.A. -  & 2.9% & 2.6% & 2.3% & 0.22 \\
+    BNY MELLON - PRUDENCIAL & 23.3% & 21.8% & 19.9% & 0.20 \\
+    UBS (BRASIL) - PRUDENCIAL & 4.2% & 3.9% & 3.5% & 0.20 \\
+    BCO CLASSICO S.A. - PRUDENCIAL & 1.3% & 1.2% & 1.1% & 0.20 \\
+    SCOTIABANK BRASIL - PRUDENCIAL & 2.7% & 2.5% & 2.2% & 0.19 \\
+    BCO SUMITOMO MITSUI BRASIL S.A & 7.8% & 7.3% & 6.5% & 0.19 \\
+    GOLDMAN SACHS - PRUDENCIAL & 7.5% & 7.0% & 6.3% & 0.19 \\
+    JP MORGAN CHASE - PRUDENCIAL & 2.5% & 2.3% & 2.1% & 0.19 \\
+    BOFA MERRILL LYNCH - PRUDENCIA & 1.7% & 1.5% & 1.4% & 0.19 \\
+    VOLVO - PRUDENCIAL & 1.0% & 0.9% & 0.8% & 0.19 \\
     \hline
   \end{tabular}
 \end{table}
